@@ -1,0 +1,80 @@
+name: dayflow
+description: "DayFlow — Gestión de actividades, hábitos y estadísticas personales. Offline-first."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # Navigation
+  go_router: ^14.6.2
+
+  # Database
+  sqflite: ^2.3.3+1
+  sqflite_common_ffi: ^2.3.4
+  path: ^1.9.0
+
+  # Local storage
+  shared_preferences: ^2.3.2
+
+  # Notifications
+  flutter_local_notifications: ^17.2.4
+  timezone: ^0.9.4
+
+  # Charts
+  fl_chart: ^0.70.2
+
+  # Internationalization
+  intl: ^0.20.2
+
+  # Functional programming
+  dartz: ^0.10.1
+  equatable: ^2.0.5
+
+  # Cryptography
+  crypto: ^3.0.3
+
+  # Biometric authentication
+  local_auth: ^2.3.0
+  local_auth_android: ^1.0.56
+  local_auth_darwin: ^1.6.1
+
+  # Cloud sync
+  google_sign_in: ^6.2.1
+  googleapis: ^13.2.0
+  extension_google_sign_in_as_googleapis_auth: ^2.0.12
+
+  # Home screen widget
+  home_widget: ^0.7.0
+
+  # Export / Backup
+  path_provider: ^2.1.4
+  csv: ^6.0.0
+  pdf: ^3.10.8
+  archive: ^3.6.1
+
+  # UI / Animations
+  shimmer: ^3.0.0
+  confetti: ^0.8.0
+  table_calendar: ^3.0.9
+  flutter_animate: ^4.5.0
+
+  flutter_localizations:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
