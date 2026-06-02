@@ -196,17 +196,29 @@ class HabitRepositoryImpl implements HabitRepository {
   @override
   Future<Either<Failure, int>> getHabitStreak(int habitId) async {
     try {
+      final today = DateTime.now();
+      final maxDays = 365;
+      final startDate = _isoDate(today.subtract(Duration(days: maxDays)));
+      final endDate = _isoDate(today);
+
+      final rows = await _db.rawQuery(
+        'SELECT DISTINCT date FROM habit_progress '
+        'WHERE habit_id = ? AND date BETWEEN ? AND ? AND current_value >= target_value '
+        'ORDER BY date DESC',
+        [habitId, startDate, endDate],
+      );
+
+      final completedDates = rows.map((r) => r['date'] as String).toSet();
       int streak = 0;
-      DateTime day = DateTime.now();
+      DateTime day = today;
       while (true) {
         final dateStr = _isoDate(day);
-        final rows = await _db.queryHabitProgress(
-          where: 'habit_id = ? AND date = ? AND current_value >= target_value',
-          whereArgs: [habitId, dateStr],
-        );
-        if (rows.isEmpty) break;
-        streak++;
-        day = day.subtract(const Duration(days: 1));
+        if (completedDates.contains(dateStr)) {
+          streak++;
+          day = day.subtract(const Duration(days: 1));
+        } else {
+          break;
+        }
       }
       return Right(streak);
     } on AppException catch (e) {
@@ -219,17 +231,29 @@ class HabitRepositoryImpl implements HabitRepository {
   @override
   Future<Either<Failure, int>> getGlobalStreak() async {
     try {
+      final today = DateTime.now();
+      final maxDays = 365;
+      final startDate = _isoDate(today.subtract(Duration(days: maxDays)));
+      final endDate = _isoDate(today);
+
+      final rows = await _db.rawQuery(
+        'SELECT DISTINCT date FROM habit_progress '
+        'WHERE date BETWEEN ? AND ? AND current_value >= target_value '
+        'ORDER BY date DESC',
+        [startDate, endDate],
+      );
+
+      final completedDates = rows.map((r) => r['date'] as String).toSet();
       int streak = 0;
-      DateTime day = DateTime.now();
+      DateTime day = today;
       while (true) {
         final dateStr = _isoDate(day);
-        final rows = await _db.queryHabitProgress(
-          where: 'date = ? AND current_value >= target_value',
-          whereArgs: [dateStr],
-        );
-        if (rows.isEmpty) break;
-        streak++;
-        day = day.subtract(const Duration(days: 1));
+        if (completedDates.contains(dateStr)) {
+          streak++;
+          day = day.subtract(const Duration(days: 1));
+        } else {
+          break;
+        }
       }
       return Right(streak);
     } on AppException catch (e) {
