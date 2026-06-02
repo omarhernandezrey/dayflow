@@ -201,4 +201,19 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(UnexpectedFailure(e.toString(), stackTrace: st));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> restoreSession(int userId) async {
+    try {
+      await _db.rawQuery(
+        'INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)',
+        [_sessionKey, userId.toString()],
+      );
+      return const Right(null);
+    } on AppException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    } catch (e, st) {
+      return Left(UnexpectedFailure(e.toString(), stackTrace: st));
+    }
+  }
 }

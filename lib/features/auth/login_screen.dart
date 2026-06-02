@@ -63,12 +63,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
-    // Restore session by setting current_user_id in settings
-    final db = ref.read(localDatabaseProvider);
-    await db.rawQuery(
-      'INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)',
-      ['current_user_id', user.id.toString()],
-    );
+    // Restore session via auth repository
+    final restoreResult = await ref.read(restoreSessionUseCaseProvider)(user.id!);
+    if (restoreResult.isLeft()) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al restaurar sesión')),
+      );
+      return;
+    }
 
     // Refresh auth state
     await ref.read(authStateProvider.notifier).build();

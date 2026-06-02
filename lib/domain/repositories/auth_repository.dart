@@ -22,4 +22,6 @@ abstract class AuthRepository {
   Future<Either<Failure, bool>> isAuthenticated();
 
   Future<Either<Failure, UserEntity?>> getMostRecentUser();
+
+  Future<Either<Failure, void>> restoreSession(int userId);
 }

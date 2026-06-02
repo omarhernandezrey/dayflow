@@ -25,6 +25,7 @@ import '../../domain/usecases/auth/is_authenticated.dart';
 import '../../domain/usecases/auth/login.dart';
 import '../../domain/usecases/auth/logout.dart';
 import '../../domain/usecases/auth/register.dart';
+import '../../domain/usecases/auth/restore_session.dart';
 import '../../domain/usecases/backup/backup_usecases.dart';
 import '../../domain/usecases/habits/add_habit.dart';
 import '../../domain/usecases/habits/delete_habit.dart';
@@ -111,6 +112,7 @@ final logoutUseCaseProvider = Provider((ref) => LogoutUseCase(ref.watch(authRepo
 final getCurrentUserUseCaseProvider = Provider((ref) => GetCurrentUserUseCase(ref.watch(authRepositoryProvider)));
 final getMostRecentUserUseCaseProvider = Provider((ref) => GetMostRecentUserUseCase(ref.watch(authRepositoryProvider)));
 final isAuthenticatedUseCaseProvider = Provider((ref) => IsAuthenticatedUseCase(ref.watch(authRepositoryProvider)));
+final restoreSessionUseCaseProvider = Provider((ref) => RestoreSessionUseCase(ref.watch(authRepositoryProvider)));
 
 final exportToCsvUseCaseProvider = Provider((ref) => ExportToCsvUseCase(ref.watch(backupRepositoryProvider)));
 final exportToPdfUseCaseProvider = Provider((ref) => ExportToPdfUseCase(ref.watch(backupRepositoryProvider)));
