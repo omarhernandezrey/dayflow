@@ -8,7 +8,9 @@ import '../../core/errors/exceptions.dart';
 import '../../core/errors/failures.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../domain/validators/validators.dart';
 import '../datasources/local_database.dart';
+import '../helpers/repository_helper.dart';
 import '../models/user_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -51,13 +53,13 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      if (name.trim().isEmpty) {
+      if (!Validators.isNotEmpty(name)) {
         return const Left(ValidationFailure('El nombre es obligatorio'));
       }
-      if (email.trim().isEmpty || !email.contains('@')) {
+      if (!Validators.isValidEmail(email)) {
         return const Left(ValidationFailure('Correo electrónico inválido'));
       }
-      if (password.length < 6) {
+      if (!Validators.isValidPassword(password)) {
         return const Left(
             ValidationFailure('La contraseña debe tener al menos 6 caracteres'));
       }
