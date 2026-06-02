@@ -5,8 +5,8 @@ import '../../core/errors/exceptions.dart';
 import 'local_database.dart';
 
 class LocalDatabaseImpl implements LocalDatabase {
-  static const String _dbName = 'dayflow_v3.db';
-  static const int _dbVersion = 1;
+  static const String _dbName = 'dayflow.db';
+  static const int _dbVersion = 3;
 
   @override
   String get databaseName => _dbName;
@@ -35,7 +35,7 @@ class LocalDatabaseImpl implements LocalDatabase {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    await _createV2Schema(db);
+    await _createCurrentSchema(db);
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -47,7 +47,7 @@ class LocalDatabaseImpl implements LocalDatabase {
     }
   }
 
-  Future<void> _createV2Schema(Database db) async {
+  Future<void> _createCurrentSchema(Database db) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS tasks (
         id               INTEGER PRIMARY KEY AUTOINCREMENT,

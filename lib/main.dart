@@ -8,8 +8,10 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'app.dart';
 import 'core/services/home_widget_service.dart';
+import 'data/datasources/local_database_impl.dart';
 import 'data/repositories/notification_repository_impl.dart';
 import 'domain/repositories/notification_repository.dart';
+import 'presentation/providers/dependency_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,14 +27,35 @@ Future<void> main() async {
   await notifications.init();
   await notifications.requestPermissions();
 
-  // Initialize home screen widget (safe if native config missing)
   try {
     await HomeWidgetService.init();
   } catch (_) {}
 
+  final container = ProviderContainer();
+  final db = container.read(localDatabaseProvider);
+
   runApp(
-    const ProviderScope(
+    UncontrolledProviderScope(
+      container: container,
       child: DayFlowApp(),
     ),
   );
+
+  WidgetsBinding.instance.addObserver(_AppLifecycleObserver(db));
+}
+
+class _AppLifecycleObserver extends WidgetsBindingObserver {
+  final LocalDatabaseImpl _db;
+
+  _AppLifecycleObserver(this._db);
+
+  @override
+  Future<void> didDetachApp() async {
+    await _db.close();
+  }
+
+  @override
+  Future<void> handleMemoryPressure() async {
+    await _db.close();
+  }
 }
