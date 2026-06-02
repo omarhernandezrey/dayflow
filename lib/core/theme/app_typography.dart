@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 abstract final class AppTypography {
-  // — UI font helpers —
+  static const String _interFamily = 'Inter';
+  static const String _monoFamily = 'JetBrainsMono';
+
   static TextStyle inter({
     double? fontSize,
     FontWeight? fontWeight,
@@ -11,7 +12,8 @@ abstract final class AppTypography {
     double? height,
     Color? color,
   }) =>
-      GoogleFonts.inter(
+      TextStyle(
+        fontFamily: _interFamily,
         fontSize: fontSize,
         fontWeight: fontWeight,
         letterSpacing: letterSpacing,
@@ -25,7 +27,8 @@ abstract final class AppTypography {
     double? letterSpacing,
     Color? color,
   }) =>
-      GoogleFonts.jetBrainsMono(
+      TextStyle(
+        fontFamily: _monoFamily,
         fontSize: fontSize,
         fontWeight: fontWeight,
         letterSpacing: letterSpacing,
@@ -33,7 +36,6 @@ abstract final class AppTypography {
         fontFeatures: const [FontFeature.tabularFigures()],
       );
 
-  // — Type scale —
   static final TextStyle display = inter(
     fontSize: 56,
     fontWeight: FontWeight.w800,
@@ -95,7 +97,6 @@ abstract final class AppTypography {
     letterSpacing: -0.4,
   );
 
-  // — Material 3 TextTheme —
   static TextTheme get textTheme => TextTheme(
         displayLarge: display,
         displayMedium: titleXl,
