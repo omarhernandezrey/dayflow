@@ -14,6 +14,7 @@ import '../../domain/repositories/achievement_repository.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/backup_repository.dart';
 import '../../domain/repositories/habit_repository.dart';
+import '../../domain/repositories/notification_repository.dart';
 import '../../domain/repositories/settings_repository.dart';
 import '../../domain/repositories/stats_repository.dart';
 import '../../domain/repositories/task_repository.dart';
@@ -44,7 +45,7 @@ import '../../domain/usecases/tasks/update_task.dart';
 // ─── Datasources ──────────────────────────────────────────────
 final localDatabaseProvider = Provider((ref) => LocalDatabaseImpl());
 final fileDatasourceProvider = Provider((ref) => FileDatasource());
-final notificationRepositoryProvider = Provider((ref) => NotificationRepositoryImpl());
+final notificationRepositoryProvider = Provider<NotificationRepository>((ref) => NotificationRepositoryImpl());
 
 // ─── Repositories ─────────────────────────────────────────────
 final taskRepositoryProvider = Provider<TaskRepository>((ref) {

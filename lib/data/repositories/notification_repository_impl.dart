@@ -5,23 +5,21 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../../core/constants/app_constants.dart';
 import '../../domain/entities/task.dart';
+import '../../domain/repositories/notification_repository.dart';
 
-/// Notification repository implementation.
-/// Handles all local notification scheduling, cancellation and permission requests.
-class NotificationRepositoryImpl {
+class NotificationRepositoryImpl implements NotificationRepository {
   final _plugin = FlutterLocalNotificationsPlugin();
   bool _ready = false;
 
+  @override
   Future<void> init() async {
     if (_ready) return;
     tz_data.initializeTimeZones();
 
-    // Set local timezone explicitly to prevent UTC fallback
     final local = DateTime.now().timeZoneName;
     try {
       tz.setLocalLocation(tz.getLocation(local));
     } catch (_) {
-      // Fallback to UTC if timezone name is not recognized
       tz.setLocalLocation(tz.UTC);
     }
 
@@ -37,6 +35,7 @@ class NotificationRepositoryImpl {
     _ready = true;
   }
 
+  @override
   Future<bool> requestPermissions() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
       final android = _plugin.resolvePlatformSpecificImplementation<
@@ -56,6 +55,7 @@ class NotificationRepositoryImpl {
     return true;
   }
 
+  @override
   Future<void> scheduleTaskReminder(TaskEntity task) async {
     if (!_ready || task.id == null) return;
     final scheduled = task.scheduledDateTime;
@@ -89,11 +89,13 @@ class NotificationRepositoryImpl {
     );
   }
 
+  @override
   Future<void> cancelReminder(int taskId) async {
     if (!_ready) return;
     await _plugin.cancel(taskId);
   }
 
+  @override
   Future<void> cancelAll() async {
     if (!_ready) return;
     await _plugin.cancelAll();

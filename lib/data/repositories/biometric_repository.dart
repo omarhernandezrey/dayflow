@@ -1,13 +1,15 @@
 import 'package:dartz/dartz.dart';
 
 import '../../core/errors/failures.dart';
+import '../../domain/repositories/biometric_repository.dart';
 import '../datasources/biometric_datasource.dart';
 
-class BiometricRepository {
+class BiometricRepositoryImpl implements BiometricRepository {
   final BiometricDatasource _datasource;
 
-  BiometricRepository(this._datasource);
+  BiometricRepositoryImpl(this._datasource);
 
+  @override
   Future<Either<Failure, bool>> isAvailable() async {
     try {
       final supported = await _datasource.isDeviceSupported();
@@ -19,6 +21,7 @@ class BiometricRepository {
     }
   }
 
+  @override
   Future<Either<Failure, bool>> authenticate() async {
     try {
       final result = await _datasource.authenticate();

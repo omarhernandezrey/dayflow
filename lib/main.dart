@@ -9,21 +9,19 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'app.dart';
 import 'core/services/home_widget_service.dart';
 import 'data/repositories/notification_repository_impl.dart';
+import 'domain/repositories/notification_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // sqflite FFI required on Windows / Linux / macOS
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   }
 
-  // Initialize Spanish locale for date formatting
   await initializeDateFormatting('es', null);
 
-  // Initialize notification service
-  final notifications = NotificationRepositoryImpl();
+  final NotificationRepository notifications = NotificationRepositoryImpl();
   await notifications.init();
   await notifications.requestPermissions();
 

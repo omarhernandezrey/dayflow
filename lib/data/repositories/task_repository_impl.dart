@@ -3,14 +3,14 @@ import 'package:dartz/dartz.dart';
 import '../../core/errors/exceptions.dart';
 import '../../core/errors/failures.dart';
 import '../../domain/entities/task.dart';
+import '../../domain/repositories/notification_repository.dart';
 import '../../domain/repositories/task_repository.dart';
 import '../datasources/local_database.dart';
 import '../models/task_model.dart';
-import 'notification_repository_impl.dart';
 
 class TaskRepositoryImpl implements TaskRepository {
   final LocalDatabase _db;
-  final NotificationRepositoryImpl _notifications;
+  final NotificationRepository _notifications;
 
   TaskRepositoryImpl(this._db, this._notifications);
 

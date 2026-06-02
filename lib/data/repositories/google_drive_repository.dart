@@ -2,13 +2,15 @@ import 'package:dartz/dartz.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 
 import '../../core/errors/failures.dart';
+import '../../domain/repositories/google_drive_repository.dart';
 import '../datasources/google_drive_datasource.dart';
 
-class GoogleDriveRepository {
+class GoogleDriveRepositoryImpl implements GoogleDriveRepository {
   final GoogleDriveDatasource _datasource;
 
-  GoogleDriveRepository(this._datasource);
+  GoogleDriveRepositoryImpl(this._datasource);
 
+  @override
   Future<Either<Failure, bool>> isSignedIn() async {
     try {
       final result = await _datasource.isSignedIn();
@@ -18,6 +20,7 @@ class GoogleDriveRepository {
     }
   }
 
+  @override
   Future<Either<Failure, void>> signIn() async {
     try {
       await _datasource.signIn();
@@ -27,6 +30,7 @@ class GoogleDriveRepository {
     }
   }
 
+  @override
   Future<Either<Failure, void>> signOut() async {
     try {
       await _datasource.signOut();
@@ -36,6 +40,7 @@ class GoogleDriveRepository {
     }
   }
 
+  @override
   Future<Either<Failure, String>> uploadBackup(String filePath) async {
     try {
       final id = await _datasource.uploadBackup(filePath);
@@ -45,6 +50,7 @@ class GoogleDriveRepository {
     }
   }
 
+  @override
   Future<Either<Failure, String>> downloadBackup(String fileId, String destinationPath) async {
     try {
       final path = await _datasource.downloadBackup(fileId, destinationPath);
@@ -54,6 +60,7 @@ class GoogleDriveRepository {
     }
   }
 
+  @override
   Future<Either<Failure, List<drive.File>>> listBackups() async {
     try {
       final files = await _datasource.listBackups();
