@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/habit.dart';
 import '../../domain/entities/habit_progress.dart';
+import '../../../core/utils/df_date_utils.dart';
 import 'dependency_providers.dart';
 
 final habitsProvider = AsyncNotifierProvider<HabitsNotifier, List<HabitEntity>>(HabitsNotifier.new);
@@ -60,14 +61,14 @@ class TodayProgressNotifier extends AsyncNotifier<Map<int, HabitProgressEntity>>
   @override
   Future<Map<int, HabitProgressEntity>> build() async {
     final repo = ref.read(habitRepositoryProvider);
-    final today = _isoDate(DateTime.now());
+    final today = DFDateUtils.isoDate(DateTime.now());
     final result = await repo.getAllProgressForDate(today);
     return result.getOrElse(() => {});
   }
 
   Future<void> increment(int habitId, double amount) async {
     final useCase = ref.read(incrementHabitProgressUseCaseProvider);
-    final today = _isoDate(DateTime.now());
+    final today = DFDateUtils.isoDate(DateTime.now());
     final result = await useCase.call(habitId: habitId, date: today, amount: amount);
     result.fold(
       (failure) => state = AsyncValue.error(failure, StackTrace.current),
@@ -77,13 +78,10 @@ class TodayProgressNotifier extends AsyncNotifier<Map<int, HabitProgressEntity>>
 
   Future<void> _refresh() async {
     final repo = ref.read(habitRepositoryProvider);
-    final today = _isoDate(DateTime.now());
+    final today = DFDateUtils.isoDate(DateTime.now());
     final result = await repo.getAllProgressForDate(today);
     state = AsyncValue.data(result.getOrElse(() => {}));
   }
-
-  static String _isoDate(DateTime d) =>
-      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }
 
 // Global streak

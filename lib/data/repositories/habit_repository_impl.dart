@@ -6,6 +6,7 @@ import '../../domain/entities/habit.dart';
 import '../../domain/entities/habit_progress.dart';
 import '../../domain/repositories/habit_repository.dart';
 import '../datasources/local_database.dart';
+import '../../core/utils/df_date_utils.dart';
 import '../models/habit_model.dart';
 import '../models/habit_progress_model.dart';
 
@@ -198,8 +199,8 @@ class HabitRepositoryImpl implements HabitRepository {
     try {
       final today = DateTime.now();
       final maxDays = 365;
-      final startDate = _isoDate(today.subtract(Duration(days: maxDays)));
-      final endDate = _isoDate(today);
+      final startDate = DFDateUtils.isoDate(today.subtract(Duration(days: maxDays)));
+      final endDate = DFDateUtils.isoDate(today);
 
       final rows = await _db.rawQuery(
         'SELECT DISTINCT date FROM habit_progress '
@@ -212,7 +213,7 @@ class HabitRepositoryImpl implements HabitRepository {
       int streak = 0;
       DateTime day = today;
       while (true) {
-        final dateStr = _isoDate(day);
+        final dateStr = DFDateUtils.isoDate(day);
         if (completedDates.contains(dateStr)) {
           streak++;
           day = day.subtract(const Duration(days: 1));
@@ -233,8 +234,8 @@ class HabitRepositoryImpl implements HabitRepository {
     try {
       final today = DateTime.now();
       final maxDays = 365;
-      final startDate = _isoDate(today.subtract(Duration(days: maxDays)));
-      final endDate = _isoDate(today);
+      final startDate = DFDateUtils.isoDate(today.subtract(Duration(days: maxDays)));
+      final endDate = DFDateUtils.isoDate(today);
 
       final rows = await _db.rawQuery(
         'SELECT DISTINCT date FROM habit_progress '
@@ -247,7 +248,7 @@ class HabitRepositoryImpl implements HabitRepository {
       int streak = 0;
       DateTime day = today;
       while (true) {
-        final dateStr = _isoDate(day);
+        final dateStr = DFDateUtils.isoDate(day);
         if (completedDates.contains(dateStr)) {
           streak++;
           day = day.subtract(const Duration(days: 1));
@@ -262,7 +263,4 @@ class HabitRepositoryImpl implements HabitRepository {
       return Left(UnexpectedFailure(e.toString(), stackTrace: st));
     }
   }
-
-  static String _isoDate(DateTime d) =>
-      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }

@@ -7,6 +7,7 @@ import '../../domain/entities/monthly_stats.dart';
 import '../../domain/entities/weekly_stats.dart';
 import '../../domain/repositories/stats_repository.dart';
 import '../datasources/local_database.dart';
+import '../../core/utils/df_date_utils.dart';
 import '../models/habit_model.dart';
 
 class StatsRepositoryImpl implements StatsRepository {
@@ -17,7 +18,7 @@ class StatsRepositoryImpl implements StatsRepository {
   @override
   Future<Either<Failure, DailySummaryEntity>> getTodayStats() async {
     try {
-      final today = _isoDate(DateTime.now());
+      final today = DFDateUtils.isoDate(DateTime.now());
 
       final tasks = await _db.queryTasks(where: 'date = ?', whereArgs: [today]);
       final completedTasks = tasks.where((r) => r['completed'] == 1).length;
@@ -58,9 +59,9 @@ class StatsRepositoryImpl implements StatsRepository {
   Future<Either<Failure, WeeklyStatsEntity>> getWeeklyStats() async {
     try {
       final now = DateTime.now();
-      final weekStart = _startOfWeek(now);
-      final weekEndStr = _isoDate(weekStart.add(const Duration(days: 6)));
-      final weekStartStr = _isoDate(weekStart);
+      final weekStart = DFDateUtils.startOfWeek(now);
+      final weekEndStr = DFDateUtils.isoDate(weekStart.add(const Duration(days: 6)));
+      final weekStartStr = DFDateUtils.isoDate(weekStart);
 
       final allWeekTasks = await _db.rawQuery(
         'SELECT date, completed FROM tasks WHERE date BETWEEN ? AND ? ORDER BY date',
@@ -70,11 +71,11 @@ class StatsRepositoryImpl implements StatsRepository {
       final Map<String, _DayData> dayData = {};
       for (int i = 0; i < 7; i++) {
         final day = weekStart.add(Duration(days: i));
-        final dateStr = _isoDate(day);
+        final dateStr = DFDateUtils.isoDate(day);
         dayData[dateStr] = _DayData(
           total: 0,
           completed: 0,
-          label: _dayLabel(day.weekday),
+          label: DFDateUtils.dayLabel(day.weekday),
           isFuture: day.isAfter(now),
         );
       }
@@ -121,7 +122,7 @@ class StatsRepositoryImpl implements StatsRepository {
           final day = weekStart.add(Duration(days: i));
           if (h.isActiveOnDay(day.weekday)) {
             totalChecks++;
-            final key = '${h.id}_${_isoDate(day)}';
+            final key = '${h.id}_${DFDateUtils.isoDate(day)}';
             if (completedProgressSet.contains(key)) {
               completedChecks++;
             }
@@ -200,7 +201,7 @@ class StatsRepositoryImpl implements StatsRepository {
       int currentStreak = 0;
       DateTime checkDay = DateTime.now();
       while (checkDay.year == year && checkDay.month == month && checkDay.day >= 1) {
-        final dateStr = _isoDate(checkDay);
+        final dateStr = DFDateUtils.isoDate(checkDay);
         final data = dayData[dateStr];
         if (data != null && data.total > 0 && data.completed == data.total) {
           currentStreak++;
@@ -225,19 +226,6 @@ class StatsRepositoryImpl implements StatsRepository {
     } catch (e, st) {
       return Left(UnexpectedFailure(e.toString(), stackTrace: st));
     }
-  }
-
-  static String _isoDate(DateTime d) =>
-      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-
-  static DateTime _startOfWeek(DateTime date) {
-    final weekday = date.weekday;
-    return DateTime(date.year, date.month, date.day - (weekday - 1));
-  }
-
-  static String _dayLabel(int weekday) {
-    const labels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-    return labels[weekday - 1];
   }
 }
 

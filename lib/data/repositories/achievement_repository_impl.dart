@@ -5,6 +5,7 @@ import '../../core/errors/failures.dart';
 import '../../domain/entities/achievement.dart';
 import '../../domain/repositories/achievement_repository.dart';
 import '../datasources/local_database.dart';
+import '../../core/utils/df_date_utils.dart';
 import '../models/achievement_model.dart';
 
 class AchievementRepositoryImpl implements AchievementRepository {
@@ -111,7 +112,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
     int streak = 0;
     DateTime day = DateTime.now();
     while (true) {
-      final dateStr = _isoDate(day);
+      final dateStr = DFDateUtils.isoDate(day);
       final progress = await _db.queryHabitProgress(
         where: 'date = ? AND current_value >= target_value',
         whereArgs: [dateStr],
@@ -133,7 +134,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
       for (int i = 0; i < 7; i++) {
         final day = weekStart.add(Duration(days: i));
         if (day.isAfter(now)) continue;
-        final dateStr = _isoDate(day);
+        final dateStr = DFDateUtils.isoDate(day);
         final tasks = await _db.queryTasks(where: 'date = ?', whereArgs: [dateStr]);
         if (tasks.isNotEmpty && tasks.any((r) => r['completed'] == 0)) {
           perfect = false;
@@ -144,7 +145,4 @@ class AchievementRepositoryImpl implements AchievementRepository {
     }
     return perfectWeeks;
   }
-
-  static String _isoDate(DateTime d) =>
-      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }
