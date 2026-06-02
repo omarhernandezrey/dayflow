@@ -60,7 +60,7 @@ class BackupRepositoryImpl implements BackupRepository {
   Future<Either<Failure, String>> createBackup() async {
     try {
       final dbDir = await getDatabasesPath();
-      final dbPath = join(dbDir, 'dayflow_v2.db');
+      final dbPath = join(dbDir, _db.databaseName);
       final dbFile = File(dbPath);
 
       if (!await dbFile.exists()) {
@@ -84,7 +84,7 @@ class BackupRepositoryImpl implements BackupRepository {
   Future<Either<Failure, void>> restoreBackup(String filePath) async {
     try {
       final dbDir = await getDatabasesPath();
-      final dbPath = join(dbDir, 'dayflow_v2.db');
+      final dbPath = join(dbDir, _db.databaseName);
 
       await _fileDs.restoreBackupZip(
         backupFilePath: filePath,

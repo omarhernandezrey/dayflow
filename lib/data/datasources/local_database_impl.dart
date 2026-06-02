@@ -8,6 +8,9 @@ class LocalDatabaseImpl implements LocalDatabase {
   static const String _dbName = 'dayflow_v3.db';
   static const int _dbVersion = 1;
 
+  @override
+  String get databaseName => _dbName;
+
   Database? _db;
 
   Future<Database> get _database async => _db ??= await _init();

@@ -3,6 +3,8 @@ import '../../core/errors/exceptions.dart';
 /// Abstract contract for local database operations.
 /// All methods throw [AppException] on failure.
 abstract class LocalDatabase {
+  String get databaseName;
+
   Future<int> insertTask(Map<String, dynamic> map);
   Future<int> updateTask(Map<String, dynamic> map, int id);
   Future<int> deleteTask(int id);
