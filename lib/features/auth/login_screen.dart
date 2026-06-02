@@ -208,20 +208,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           children: [
                             const SizedBox(height: AppDimensions.s3),
                             Center(
-                              child: GestureDetector(
-                                onTap: _biometricLogin,
-                                child: Container(
-                                  width: 52,
-                                  height: 52,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surface,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: AppColors.border),
-                                  ),
-                                  child: const Icon(
-                                    Icons.fingerprint_rounded,
-                                    color: AppColors.blue,
-                                    size: 26,
+                              child: Semantics(
+                                button: true,
+                                label: 'Iniciar sesión con biometría',
+                                child: InkWell(
+                                  onTap: _biometricLogin,
+                                  customBorder: const CircleBorder(),
+                                  child: Container(
+                                    width: 52,
+                                    height: 52,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.surface,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: AppColors.border),
+                                    ),
+                                    child: const Icon(
+                                      Icons.fingerprint_rounded,
+                                      color: AppColors.blue,
+                                      size: 26,
+                                    ),
                                   ),
                                 ),
                               ),

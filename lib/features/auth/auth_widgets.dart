@@ -40,17 +40,22 @@ class DFBackBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(AppDimensions.rSm + 2),
+    return Semantics(
+      button: true,
+      label: 'Volver',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppDimensions.rSm + 2),
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            border: Border.all(color: AppColors.border),
+            borderRadius: BorderRadius.circular(AppDimensions.rSm + 2),
+          ),
+          child: const Icon(Icons.chevron_left_rounded, color: AppColors.text, size: 20),
         ),
-        child: const Icon(Icons.chevron_left_rounded, color: AppColors.text, size: 20),
       ),
     );
   }
@@ -176,41 +181,46 @@ class DFPrimaryBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = color ?? AppColors.blue;
-    return GestureDetector(
-      onTap: isLoading ? null : onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          color: c,
-          borderRadius: BorderRadius.circular(AppDimensions.rMd),
-          boxShadow: [
-            BoxShadow(
-              color: c.withAlpha(64),
-              blurRadius: 24,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        alignment: Alignment.center,
-        child: isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: Colors.white,
-                ),
-              )
-            : Text(
-                label,
-                style: AppTypography.inter(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.2,
-                  color: Colors.white,
-                ),
+    return Semantics(
+      button: true,
+      label: label,
+      child: InkWell(
+        onTap: isLoading ? null : onTap,
+        borderRadius: BorderRadius.circular(AppDimensions.rMd),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: c,
+            borderRadius: BorderRadius.circular(AppDimensions.rMd),
+            boxShadow: [
+              BoxShadow(
+                color: c.withAlpha(64),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  label,
+                  style: AppTypography.inter(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
+                    color: Colors.white,
+                  ),
+                ),
+        ),
       ),
     );
   }

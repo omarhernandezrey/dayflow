@@ -80,27 +80,32 @@ class _BottomNav extends StatelessWidget {
           final item = _items[i];
           final active = currentIndex == i;
           return Expanded(
-            child: GestureDetector(
-              onTap: () => onTap(i),
-              behavior: HitTestBehavior.opaque,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    active ? item.activeIcon : item.icon,
-                    color: active ? AppColors.blue : AppColors.textMute,
-                    size: 22,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    item.label,
-                    style: AppTypography.inter(
-                      fontSize: 10.5,
-                      fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+            child: Semantics(
+              button: true,
+              label: item.label,
+              selected: active,
+              child: InkWell(
+                onTap: () => onTap(i),
+                customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      active ? item.activeIcon : item.icon,
                       color: active ? AppColors.blue : AppColors.textMute,
+                      size: 22,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      item.label,
+                      style: AppTypography.inter(
+                        fontSize: 10.5,
+                        fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                        color: active ? AppColors.blue : AppColors.textMute,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

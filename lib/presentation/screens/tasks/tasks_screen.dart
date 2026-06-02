@@ -285,21 +285,25 @@ class _CircleCheck extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 150),
-      width: 22,
-      height: 22,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: done ? color : Colors.transparent,
-        border: Border.all(
-          color: done ? color : AppColors.borderStrong,
-          width: 1.8,
+    return Semantics(
+      button: true,
+      label: done ? 'Tarea completada' : 'Marcar tarea como completada',
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: 22,
+        height: 22,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: done ? color : Colors.transparent,
+          border: Border.all(
+            color: done ? color : AppColors.borderStrong,
+            width: 1.8,
+          ),
         ),
+        child: done
+            ? const Icon(Icons.check_rounded, size: 13, color: Colors.white)
+            : null,
       ),
-      child: done
-          ? const Icon(Icons.check_rounded, size: 13, color: Colors.white)
-          : null,
     );
   }
 }
