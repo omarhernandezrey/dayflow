@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
 
-import '../../core/errors/exceptions.dart';
 import '../../core/errors/failures.dart';
+import '../../core/utils/df_date_utils.dart';
 import '../../domain/entities/achievement.dart';
 import '../../domain/repositories/achievement_repository.dart';
 import '../datasources/local_database.dart';
-import '../../core/utils/df_date_utils.dart';
+import '../helpers/repository_helper.dart';
 import '../models/achievement_model.dart';
 
 class AchievementRepositoryImpl implements AchievementRepository {
@@ -14,75 +14,50 @@ class AchievementRepositoryImpl implements AchievementRepository {
   AchievementRepositoryImpl(this._db);
 
   @override
-  Future<Either<Failure, List<AchievementEntity>>> getAllAchievements() async {
-    try {
-      final rows = await _db.queryAchievements();
-      return Right(rows.map((r) => AchievementModel.fromMap(r).toEntity()).toList());
-    } on AppException catch (e) {
-      return Left(DatabaseFailure(e.message));
-    } catch (e, st) {
-      return Left(UnexpectedFailure(e.toString(), stackTrace: st));
-    }
-  }
+  Future<Either<Failure, List<AchievementEntity>>> getAllAchievements() =>
+      executeOrFailure(() async {
+        final rows = await _db.queryAchievements();
+        return rows.map((r) => AchievementModel.fromMap(r).toEntity()).toList();
+      });
 
   @override
-  Future<Either<Failure, List<AchievementEntity>>> getUnlockedAchievements() async {
-    try {
-      final rows = await _db.queryAchievements();
-      final achievements = rows
-          .map((r) => AchievementModel.fromMap(r).toEntity())
-          .where((a) => a.isUnlocked)
-          .toList();
-      return Right(achievements);
-    } on AppException catch (e) {
-      return Left(DatabaseFailure(e.message));
-    } catch (e, st) {
-      return Left(UnexpectedFailure(e.toString(), stackTrace: st));
-    }
-  }
+  Future<Either<Failure, List<AchievementEntity>>> getUnlockedAchievements() =>
+      executeOrFailure(() async {
+        final rows = await _db.queryAchievements();
+        return rows
+            .map((r) => AchievementModel.fromMap(r).toEntity())
+            .where((a) => a.isUnlocked)
+            .toList();
+      });
 
   @override
-  Future<Either<Failure, List<AchievementEntity>>> checkAndUnlockAchievements() async {
-    try {
-      final rows = await _db.queryAchievements();
-      final achievements = rows.map((r) => AchievementModel.fromMap(r)).toList();
-      final unlocked = <AchievementEntity>[];
+  Future<Either<Failure, List<AchievementEntity>>> checkAndUnlockAchievements() =>
+      executeOrFailure(() async {
+        final rows = await _db.queryAchievements();
+        final achievements = rows.map((r) => AchievementModel.fromMap(r)).toList();
+        final unlocked = <AchievementEntity>[];
 
-      for (final a in achievements) {
-        if (a.unlockedAt != null) continue;
+        for (final a in achievements) {
+          if (a.unlockedAt != null) continue;
 
-        final progress = await _calculateProgress(a.key);
-        if (progress != a.progress) {
-          await _db.insertOrReplaceAchievement(a.copyWith(progress: progress).toMap());
+          final progress = await _calculateProgress(a.key);
+          if (progress != a.progress) {
+            await _db.insertOrReplaceAchievement(a.copyWith(progress: progress).toMap());
+          }
+          if (progress >= a.target) {
+            final unlockedAt = DateTime.now().toIso8601String();
+            await _db.insertOrReplaceAchievement(
+              a.copyWith(progress: progress, unlockedAt: unlockedAt).toMap(),
+            );
+            unlocked.add(a.copyWith(progress: progress, unlockedAt: unlockedAt).toEntity());
+          }
         }
-        if (progress >= a.target) {
-          final unlockedAt = DateTime.now().toIso8601String();
-          await _db.insertOrReplaceAchievement(
-            a.copyWith(progress: progress, unlockedAt: unlockedAt).toMap(),
-          );
-          unlocked.add(a.copyWith(progress: progress, unlockedAt: unlockedAt).toEntity());
-        }
-      }
-
-      return Right(unlocked);
-    } on AppException catch (e) {
-      return Left(DatabaseFailure(e.message));
-    } catch (e, st) {
-      return Left(UnexpectedFailure(e.toString(), stackTrace: st));
-    }
-  }
+        return unlocked;
+      });
 
   @override
-  Future<Either<Failure, void>> seedAchievements() async {
-    try {
-      // Achievements are seeded on database creation
-      return const Right(null);
-    } on AppException catch (e) {
-      return Left(DatabaseFailure(e.message));
-    } catch (e, st) {
-      return Left(UnexpectedFailure(e.toString(), stackTrace: st));
-    }
-  }
+  Future<Either<Failure, void>> seedAchievements() =>
+      executeOrFailure(() async {});
 
   Future<int> _calculateProgress(String key) async {
     switch (key) {
@@ -109,17 +84,25 @@ class AchievementRepositoryImpl implements AchievementRepository {
   }
 
   Future<int> _calculateGlobalStreak() async {
+    final today = DateTime.now();
+    final startDate = DFDateUtils.isoDate(today.subtract(const Duration(days: 365)));
+    final endDate = DFDateUtils.isoDate(today);
+    final rows = await _db.rawQuery(
+      'SELECT DISTINCT date FROM habit_progress '
+      'WHERE date BETWEEN ? AND ? AND current_value >= target_value '
+      'ORDER BY date DESC',
+      [startDate, endDate],
+    );
+    final completedDates = rows.map((r) => r['date'] as String).toSet();
     int streak = 0;
-    DateTime day = DateTime.now();
+    DateTime day = today;
     while (true) {
-      final dateStr = DFDateUtils.isoDate(day);
-      final progress = await _db.queryHabitProgress(
-        where: 'date = ? AND current_value >= target_value',
-        whereArgs: [dateStr],
-      );
-      if (progress.isEmpty) break;
-      streak++;
-      day = day.subtract(const Duration(days: 1));
+      if (completedDates.contains(DFDateUtils.isoDate(day))) {
+        streak++;
+        day = day.subtract(const Duration(days: 1));
+      } else {
+        break;
+      }
     }
     return streak;
   }
@@ -127,7 +110,6 @@ class AchievementRepositoryImpl implements AchievementRepository {
   Future<int> _calculatePerfectWeeks() async {
     int perfectWeeks = 0;
     final now = DateTime.now();
-    // Check last 4 weeks
     for (int w = 0; w < 4; w++) {
       final weekStart = now.subtract(Duration(days: now.weekday - 1 + w * 7));
       bool perfect = true;
