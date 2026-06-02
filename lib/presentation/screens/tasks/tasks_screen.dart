@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/task_category_ext.dart';
 import '../../../core/utils/df_date_utils.dart';
 import '../../../domain/entities/task.dart';
 import '../../providers/celebration_provider.dart';
@@ -226,7 +227,7 @@ class _TaskCard extends ConsumerWidget {
                   ref.read(tasksProvider.notifier).toggle(task.id!, !task.completed);
                 }
               },
-              child: _CircleCheck(done: task.completed, color: _categoryColor(task.category)),
+              child: _CircleCheck(done: task.completed, color: task.category.color),
             ),
             const SizedBox(width: AppDimensions.s3),
             Expanded(
@@ -262,30 +263,19 @@ class _TaskCard extends ConsumerWidget {
                 ],
               ),
             ),
-            Container(
-              width: 10,
-              height: 10,
-              decoration: BoxDecoration(
-                color: _categoryColor(task.category),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Color _categoryColor(TaskCategory c) {
-    switch (c) {
-      case TaskCategory.academic:
-        return AppColors.catAcademic;
-      case TaskCategory.health:
-        return AppColors.catHealth;
-      case TaskCategory.personal:
-        return AppColors.catPersonal;
-    }
-  }
+Container(
+               width: 10,
+               height: 10,
+               decoration: BoxDecoration(
+                 color: task.category.color,
+                 shape: BoxShape.circle,
+               ),
+             ),
+           ],
+         ),
+       ),
+     );
+   }
 }
 
 class _CircleCheck extends StatelessWidget {

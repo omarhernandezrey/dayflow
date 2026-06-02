@@ -1,7 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-
-import '../../core/theme/app_colors.dart';
 
 enum TaskCategory {
   personal,
@@ -27,17 +24,6 @@ enum TaskCategory {
         return 'Académica';
       case TaskCategory.health:
         return 'Salud';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case TaskCategory.academic:
-        return AppColors.catAcademic;
-      case TaskCategory.health:
-        return AppColors.catHealth;
-      case TaskCategory.personal:
-        return AppColors.catPersonal;
     }
   }
 

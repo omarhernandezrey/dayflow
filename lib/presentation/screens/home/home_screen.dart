@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/task_category_ext.dart';
 import '../../../core/utils/df_date_utils.dart';
 import '../../../domain/entities/daily_summary.dart';
 import '../../../domain/entities/task.dart';
@@ -275,28 +276,17 @@ class _UpcomingTaskCard extends StatelessWidget {
                 ],
               ),
             ),
-            Container(
-              width: 10,
-              height: 10,
-              decoration: BoxDecoration(
-                color: _categoryColor(task.category),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Color _categoryColor(TaskCategory category) {
-    switch (category) {
-      case TaskCategory.academic:
-        return AppColors.catAcademic;
-      case TaskCategory.health:
-        return AppColors.catHealth;
-      case TaskCategory.personal:
-        return AppColors.catPersonal;
-    }
-  }
+Container(
+               width: 10,
+               height: 10,
+               decoration: BoxDecoration(
+                 color: task.category.color,
+                 shape: BoxShape.circle,
+               ),
+             ),
+           ],
+         ),
+       ),
+     );
+   }
 }

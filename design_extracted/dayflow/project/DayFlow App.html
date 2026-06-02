@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>DayFlow · App Flutter (Dark)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #efeae0;
+               font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  @keyframes dfBlink { 50% { opacity: 0; } }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="shell.jsx"></script>
+<script type="text/babel" src="main-screens.jsx"></script>
+<script type="text/babel" src="extra-screens.jsx"></script>
+<script type="text/babel" src="auth-screens.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+function App() {
+  return (
+    <DesignCanvas
+      title="DayFlow"
+      subtitle="App de productividad en Flutter · Tema oscuro · 15 pantallas"
+    >
+      {/* Section 0: Autenticación */}
+      <DCSection
+        id="auth"
+        title="Autenticación"
+        subtitle="Splash, login, registro y recuperación de contraseña"
+      >
+        <DCArtboard id="splash"   label="00 · Splash / Bienvenida"  width={360} height={780}>
+          <SplashScreen />
+        </DCArtboard>
+        <DCArtboard id="login"    label="01 · Iniciar sesión"       width={360} height={780}>
+          <LoginScreen />
+        </DCArtboard>
+        <DCArtboard id="register" label="02 · Crear cuenta"          width={360} height={780}>
+          <RegisterScreen />
+        </DCArtboard>
+        <DCArtboard id="forgot"   label="03 · Recuperar contraseña"  width={360} height={780}>
+          <ForgotPasswordScreen />
+        </DCArtboard>
+      </DCSection>
+
+      {/* Section 1: Las 4 pantallas principales (capturas) */}
+      <DCSection
+        id="main"
+        title="Pantallas principales"
+        subtitle="Las 4 vistas del Bottom Navigation Bar — versiones en modo oscuro de los mockups originales"
+      >
+        <DCArtboard id="home"   label="01 · Home / Dashboard"  width={360} height={780}>
+          <HomeScreen />
+        </DCArtboard>
+        <DCArtboard id="tareas" label="02 · Tareas"            width={360} height={780}>
+          <TareasScreen />
+        </DCArtboard>
+        <DCArtboard id="habitos" label="03 · Hábitos"          width={360} height={780}>
+          <HabitosScreen />
+        </DCArtboard>
+        <DCArtboard id="stats"  label="04 · Estadísticas"      width={360} height={780}>
+          <EstadisticasScreen />
+        </DCArtboard>
+        <DCArtboard id="mas"    label="05 · Más"                width={360} height={780}>
+          <MasScreen />
+        </DCArtboard>
+      </DCSection>
+
+      {/* Section 2: Pantallas de creación / edición */}
+      <DCSection
+        id="create"
+        title="Crear · Editar"
+        subtitle="RF1, RF2, RF8 — registro y gestión de actividades y hábitos"
+      >
+        <DCArtboard id="add-task"  label="05 · Nueva tarea (RF1)"   width={360} height={780}>
+          <AddTaskScreen />
+        </DCArtboard>
+        <DCArtboard id="add-habit" label="06 · Nuevo hábito (RF8)"  width={360} height={780}>
+          <AddHabitScreen />
+        </DCArtboard>
+        <DCArtboard id="task-detail" label="07 · Detalle de tarea"  width={360} height={780}>
+          <TaskDetailScreen />
+        </DCArtboard>
+      </DCSection>
+
+      {/* Section 3: Sistema / soporte */}
+      <DCSection
+        id="system"
+        title="Soporte y sistema"
+        subtitle="Notificaciones locales (RF4), menú lateral y perfil con logros"
+      >
+        <DCArtboard id="notifs" label="08 · Notificaciones (RF4)" width={360} height={780}>
+          <NotificationsScreen />
+        </DCArtboard>
+        <DCArtboard id="menu"   label="09 · Menú lateral"          width={360} height={780}>
+          <MenuScreen />
+        </DCArtboard>
+        <DCArtboard id="profile" label="10 · Mi perfil · Logros"   width={360} height={780}>
+          <ProfileScreen />
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
