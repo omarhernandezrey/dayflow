@@ -4,14 +4,12 @@ class UserEntity extends Equatable {
   final int? id;
   final String name;
   final String email;
-  final String passwordHash;
   final String? createdAt;
 
   const UserEntity({
     this.id,
     required this.name,
     required this.email,
-    required this.passwordHash,
     this.createdAt,
   });
 
@@ -19,14 +17,12 @@ class UserEntity extends Equatable {
     int? id,
     String? name,
     String? email,
-    String? passwordHash,
     String? createdAt,
   }) =>
       UserEntity(
         id: id ?? this.id,
         name: name ?? this.name,
         email: email ?? this.email,
-        passwordHash: passwordHash ?? this.passwordHash,
         createdAt: createdAt ?? this.createdAt,
       );
 
@@ -38,5 +34,5 @@ class UserEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, email, passwordHash, createdAt];
+  List<Object?> get props => [id, name, email, createdAt];
 }

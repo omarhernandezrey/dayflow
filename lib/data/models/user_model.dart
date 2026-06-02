@@ -15,19 +15,10 @@ class UserModel {
     this.createdAt,
   });
 
-  factory UserModel.fromEntity(UserEntity entity) => UserModel(
-        id: entity.id,
-        name: entity.name,
-        email: entity.email,
-        passwordHash: entity.passwordHash,
-        createdAt: entity.createdAt,
-      );
-
   UserEntity toEntity() => UserEntity(
         id: id,
         name: name,
         email: email,
-        passwordHash: passwordHash,
         createdAt: createdAt,
       );
 
