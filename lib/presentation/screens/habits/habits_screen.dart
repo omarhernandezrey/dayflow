@@ -7,6 +7,7 @@ import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../domain/entities/habit.dart';
 import '../../../domain/entities/habit_progress.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../providers/celebration_provider.dart';
 import '../../providers/habits_provider.dart';
 import '../../widgets/df_empty.dart';
@@ -19,6 +20,7 @@ class HabitsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final habitsAsync = ref.watch(habitsProvider);
     final progressAsync = ref.watch(todayProgressProvider);
     final streakAsync = ref.watch(globalStreakProvider);
@@ -51,7 +53,7 @@ class HabitsScreen extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'Hábitos',
+                            l10n.habitsTab,
                             style: AppTypography.inter(
                               fontSize: 28,
                               fontWeight: FontWeight.w700,
@@ -86,7 +88,7 @@ class HabitsScreen extends ConsumerWidget {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: AppDimensions.s5),
                     child: Text(
-                      'Hábitos de hoy',
+                      l10n.todayHabits,
                       style: AppTypography.inter(
                         fontSize: 16.5,
                         fontWeight: FontWeight.w700,
@@ -97,12 +99,12 @@ class HabitsScreen extends ConsumerWidget {
                 ),
                 const SliverToBoxAdapter(child: SizedBox(height: AppDimensions.s3)),
                 if (todayHabits.isEmpty)
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: DFEmpty(
                       icon: Icons.radio_button_unchecked_rounded,
-                      title: 'No tienes hábitos para hoy',
-                      subtitle: 'Crea un hábito y empieza tu racha',
-                      actionLabel: 'Crear hábito',
+                      title: l10n.noHabitsTitle,
+                      subtitle: l10n.noHabitsSubtitle,
+                      actionLabel: l10n.noHabitsAction,
                     ),
                   )
                 else
@@ -127,7 +129,7 @@ class HabitsScreen extends ConsumerWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: AppDimensions.s5),
                       child: Text(
-                        'Todos mis hábitos'.toUpperCase(),
+                        l10n.allMyHabits.toUpperCase(),
                         style: AppTypography.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
@@ -165,6 +167,7 @@ class _StreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(AppDimensions.s4 + 2),
       decoration: BoxDecoration(
@@ -197,7 +200,7 @@ class _StreakCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'RACHA DIARIA',
+                  l10n.dailyStreak,
                   style: AppTypography.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -216,7 +219,7 @@ class _StreakCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'días seguidos',
+                  l10n.daysInARow,
                   style: AppTypography.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
@@ -239,6 +242,7 @@ class _HabitCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final color = _hexColor(habit.colorHex);
     final current = progress?.currentValue ?? 0.0;
     final target = progress?.targetValue ?? habit.goal;
@@ -279,7 +283,7 @@ class _HabitCard extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      isCompleted ? '¡Completado!' : 'Meta: $target ${habit.unit}',
+                      isCompleted ? l10n.completedExclamation : l10n.goalLabel(target.toStringAsFixed(target == target.toInt() ? 0 : 1), habit.unit),
                       style: AppTypography.inter(
                         fontSize: 12,
                         color: isCompleted ? AppColors.success : AppColors.textDim,
@@ -359,6 +363,7 @@ class _HabitManageTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final color = _hexColor(habit.colorHex);
 
     return Container(
@@ -404,10 +409,10 @@ class _HabitManageTile extends ConsumerWidget {
                 context: context,
                 builder: (_) => AlertDialog(
                   backgroundColor: AppColors.surface,
-                  title: Text('Eliminar hábito',
+                  title: Text(l10n.deleteHabit,
                       style: AppTypography.inter(fontSize: 17, fontWeight: FontWeight.w700)),
                   content: Text(
-                      '¿Eliminar "${habit.title}"? Esta acción no se puede deshacer.',
+                      l10n.deleteHabitConfirm(habit.title),
                       style: AppTypography.body),
                   actions: [
                     TextButton(

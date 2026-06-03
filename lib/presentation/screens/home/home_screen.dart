@@ -1,3 +1,4 @@
+import 'package:dayflow/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,6 +18,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final todayStats = ref.watch(todayStatsProvider);
     final upcomingAsync = ref.watch(todayUpcomingTasksProvider);
 
@@ -37,7 +39,7 @@ class HomeScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '¡Hola!',
+                      l10n.helloTitle,
                       style: AppTypography.inter(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
@@ -61,7 +63,7 @@ class HomeScreen extends ConsumerWidget {
                       data: (stats) => _DashboardCards(stats: stats),
                     ),
                     const SizedBox(height: AppDimensions.s5),
-                    _sectionTitle('Próximas actividades'),
+                    _sectionTitle(l10n.upcomingActivities),
                   ],
                 ),
               ),
@@ -75,11 +77,11 @@ class HomeScreen extends ConsumerWidget {
               ),
               data: (upcoming) {
                 if (upcoming.isEmpty) {
-                  return const SliverToBoxAdapter(
+                  return SliverToBoxAdapter(
                     child: DFEmpty(
                       icon: Icons.check_circle_outline_rounded,
-                      title: 'No tienes actividades pendientes hoy',
-                      subtitle: '¡Buen trabajo! Disfruta tu día.',
+                      title: l10n.noActivitiesToday,
+                      subtitle: l10n.goodJobDay,
                     ),
                   );
                 }
@@ -123,24 +125,25 @@ class _DashboardCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         _SummaryCard(
-          label: 'Actividades\ntotales',
+          label: l10n.totalActivities,
           value: '${stats.totalActivities}',
           color: AppColors.catAcademic,
           icon: Icons.calendar_today_outlined,
         ),
         const SizedBox(width: AppDimensions.s2 + 2),
         _SummaryCard(
-          label: 'Completadas',
+          label: l10n.completedLabel,
           value: '${stats.completedActivities}',
           color: AppColors.catHealth,
           icon: Icons.check_rounded,
         ),
         const SizedBox(width: AppDimensions.s2 + 2),
         _SummaryCard(
-          label: 'Pendientes',
+          label: l10n.pendingLabel,
           value: '${stats.pendingActivities}',
           color: AppColors.catPersonal,
           icon: Icons.access_time_outlined,

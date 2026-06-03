@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
+import '../../l10n/app_localizations.dart';
 import '../../presentation/providers/auth_provider.dart';
 import '../../presentation/providers/biometric_provider.dart';
 import '../../presentation/providers/dependency_providers.dart';
@@ -57,8 +58,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (user == null) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No hay usuario registrado')),
+        SnackBar(content: Text(l10n.noUserRegistered)),
       );
       return;
     }
@@ -67,8 +69,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final restoreResult = await ref.read(restoreSessionUseCaseProvider)(user.id!);
     if (restoreResult.isLeft()) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al restaurar sesión')),
+        SnackBar(content: Text(l10n.sessionRestoreError)),
       );
       return;
     }
@@ -81,6 +84,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final auth = ref.watch(authStateProvider);
     final isLoading = auth.isLoading;
 
@@ -104,7 +108,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const DFLogo(size: 48),
                 const SizedBox(height: AppDimensions.s5),
                 Text(
-                  '¡Hola de nuevo!',
+                  l10n.loginTitle,
                   style: AppTypography.inter(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
@@ -114,7 +118,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: AppDimensions.s1 + 2),
                 Text(
-                  'Inicia sesión para continuar con tu progreso.',
+                  l10n.loginSubtitle,
                   style: AppTypography.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -124,21 +128,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: AppDimensions.s5),
 
                 DFTextField(
-                  label: 'Correo electrónico',
+                  label: l10n.emailLabel,
                   controller: _emailCtrl,
                   hint: 'tu@email.com',
                   prefixIcon: Icons.person_outline_rounded,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'El correo es obligatorio';
-                    if (!v.contains('@')) return 'Correo inválido';
+                    if (v == null || v.trim().isEmpty) return l10n.emailRequired;
+                    if (!v.contains('@')) return l10n.emailInvalid;
                     return null;
                   },
                 ),
                 const SizedBox(height: AppDimensions.s3 - 2),
                 DFTextField(
-                  label: 'Contraseña',
+                  label: l10n.passwordLabel,
                   controller: _passwordCtrl,
                   hint: '••••••••',
                   prefixIcon: Icons.shield_outlined,
@@ -146,8 +150,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _login(),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'La contraseña es obligatoria';
-                    if (v.length < 6) return 'Mínimo 6 caracteres';
+                    if (v == null || v.isEmpty) return l10n.passwordRequired;
+                    if (v.length < 6) return l10n.passwordMinLength;
                     return null;
                   },
                 ),
@@ -158,7 +162,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: GestureDetector(
                     onTap: () => context.push('/forgot-password'),
                     child: Text(
-                      '¿Olvidaste tu contraseña?',
+                      l10n.forgotPassword,
                       style: AppTypography.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -190,7 +194,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ],
 
                 DFPrimaryBtn(
-                  label: 'Iniciar sesión',
+                  label: l10n.loginButton,
                   onTap: _login,
                   isLoading: isLoading,
                 ),
@@ -210,7 +214,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             Center(
                               child: Semantics(
                                 button: true,
-                                label: 'Iniciar sesión con biometría',
+                                label: l10n.biometricLoginLabel,
                                 child: InkWell(
                                   onTap: _biometricLogin,
                                   customBorder: const CircleBorder(),
@@ -233,7 +237,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                             const SizedBox(height: AppDimensions.s1),
                             Text(
-                              'Usar biometría',
+                              l10n.biometricPrompt,
                               style: AppTypography.inter(
                                 fontSize: 12,
                                 color: AppColors.textDim,
@@ -256,12 +260,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         color: AppColors.textDim,
                       ),
                       children: [
-                        const TextSpan(text: '¿Aún no tienes cuenta? '),
+                        TextSpan(text: l10n.alreadyHaveAccount),
                         WidgetSpan(
                           child: GestureDetector(
                             onTap: () => context.go('/register'),
                             child: Text(
-                              'Regístrate',
+                              l10n.registerButton,
                               style: AppTypography.inter(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w700,

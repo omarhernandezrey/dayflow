@@ -5,6 +5,7 @@ import 'package:googleapis/drive/v3.dart' as drive;
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../providers/backup_provider.dart';
 import '../../providers/google_drive_operation_provider.dart';
 import '../../providers/google_drive_provider.dart';
@@ -15,6 +16,7 @@ class BackupScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final backupState = ref.watch(backupOperationProvider);
     final driveAsync = ref.watch(googleDriveOperationProvider);
     final signedInAsync = ref.watch(googleDriveSignedInProvider);
@@ -25,32 +27,32 @@ class BackupScreen extends ConsumerWidget {
         backgroundColor: AppColors.bg,
         foregroundColor: AppColors.text,
         elevation: 0,
-        title: Text('Copia de seguridad', style: AppTypography.heading),
+        title: Text(l10n.backupTitle, style: AppTypography.heading),
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppDimensions.s5),
         children: [
           // ── Local backup ─────────────────────────────────────────
-          Text('LOCAL', style: _sectionStyle()),
+          Text(l10n.backupLocalSection, style: _sectionStyle()),
           const SizedBox(height: AppDimensions.s3),
           _ActionCard(
             icon: Icons.file_download_outlined,
-            title: 'Exportar a CSV',
-            subtitle: 'Exporta todas tus tareas y hábitos',
+            title: l10n.exportCsv,
+            subtitle: l10n.backupExportAllSubtitle,
             onTap: () => ref.read(backupOperationProvider.notifier).exportCsv(),
           ),
           const SizedBox(height: AppDimensions.s3),
           _ActionCard(
             icon: Icons.picture_as_pdf_outlined,
-            title: 'Exportar a PDF',
-            subtitle: 'Genera un reporte visual',
+            title: l10n.exportPdf,
+            subtitle: l10n.backupReportSubtitle,
             onTap: () => ref.read(backupOperationProvider.notifier).exportPdf(),
           ),
           const SizedBox(height: AppDimensions.s3),
           _ActionCard(
             icon: Icons.backup_outlined,
-            title: 'Crear backup ZIP',
-            subtitle: 'Copia completa de la base de datos',
+            title: l10n.createBackup,
+            subtitle: l10n.backupFullSubtitle,
             onTap: () => ref.read(backupOperationProvider.notifier).createBackup(),
           ),
 
@@ -70,7 +72,7 @@ class BackupScreen extends ConsumerWidget {
                   const SizedBox(width: AppDimensions.s3),
                   Expanded(
                     child: Text(
-                      'Guardado:\n${backupState.value}',
+                      l10n.backupSavedTo(backupState.value!),
                       style: AppTypography.inter(fontSize: 12, color: AppColors.text),
                     ),
                   ),
@@ -82,7 +84,7 @@ class BackupScreen extends ConsumerWidget {
           const SizedBox(height: AppDimensions.s5),
 
           // ── Google Drive ───────────────────────────────────────
-          Text('GOOGLE DRIVE', style: _sectionStyle()),
+          Text(l10n.backupDriveSection, style: _sectionStyle()),
           const SizedBox(height: AppDimensions.s3),
 
           signedInAsync.when(
@@ -92,8 +94,8 @@ class BackupScreen extends ConsumerWidget {
               if (!isSignedIn) {
                 return _ActionCard(
                   icon: Icons.cloud_upload_outlined,
-                  title: 'Conectar con Google Drive',
-                  subtitle: 'Sincroniza tus backups en la nube',
+                  title: l10n.backupConnectDrive,
+                  subtitle: l10n.backupSyncSubtitle,
                   onTap: () => ref.read(googleDriveOperationProvider.notifier).signIn(),
                 );
               }
@@ -102,14 +104,12 @@ class BackupScreen extends ConsumerWidget {
                 children: [
                   _ActionCard(
                     icon: Icons.cloud_upload_outlined,
-                    title: 'Subir backup a Drive',
-                    subtitle: 'Crea backup local y súbelo',
+                    title: l10n.backupUploadDrive,
+                    subtitle: l10n.backupUploadSubtitle,
                     onTap: () async {
-                      // 1. Create local backup
                       await ref.read(backupOperationProvider.notifier).createBackup();
                       final localPath = ref.read(backupOperationProvider).valueOrNull;
                       if (localPath != null && localPath.isNotEmpty) {
-                        // 2. Upload to Drive
                         await ref.read(googleDriveOperationProvider.notifier).uploadBackup(localPath);
                       }
                     },
@@ -117,8 +117,8 @@ class BackupScreen extends ConsumerWidget {
                   const SizedBox(height: AppDimensions.s3),
                   _ActionCard(
                     icon: Icons.cloud_off_outlined,
-                    title: 'Desconectar Google Drive',
-                    subtitle: 'Cerrar sesión de Google',
+                    title: l10n.backupDisconnectDrive,
+                    subtitle: l10n.backupSignOutDrive,
                     color: AppColors.danger,
                     onTap: () => ref.read(googleDriveOperationProvider.notifier).signOut(),
                   ),
@@ -129,7 +129,7 @@ class BackupScreen extends ConsumerWidget {
                     data: (files) {
                       if (files.isEmpty) {
                         return Text(
-                          'No hay backups en Drive',
+                          l10n.noDriveBackups,
                           style: AppTypography.inter(fontSize: 13, color: AppColors.textDim),
                         );
                       }
@@ -137,7 +137,7 @@ class BackupScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Backups en Drive',
+                            l10n.driveBackups,
                             style: AppTypography.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
@@ -160,12 +160,12 @@ class BackupScreen extends ConsumerWidget {
           // ── Restore local ────────────────────────────────────────
           _ActionCard(
             icon: Icons.restore_outlined,
-            title: 'Restaurar backup local',
-            subtitle: 'Selecciona un archivo .zip',
+            title: l10n.restoreBackupLocal,
+            subtitle: l10n.backupSelectZip,
             color: AppColors.danger,
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Selecciona un archivo .zip', style: AppTypography.body)),
+                SnackBar(content: Text(l10n.backupSelectZip, style: AppTypography.body)),
               );
             },
           ),
@@ -188,7 +188,8 @@ class _DriveFileTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final name = file.name ?? 'Backup';
+    final l10n = AppLocalizations.of(context)!;
+    final name = file.name ?? l10n.backupDefaultName;
     final modified = file.modifiedTime;
     final dateStr = modified != null
         ? '${modified.day}/${modified.month}/${modified.year}'
@@ -198,8 +199,9 @@ class _DriveFileTile extends ConsumerWidget {
       onTap: () async {
         final path = await ref.read(googleDriveOperationProvider.notifier).downloadBackup(file.id!);
         if (path != null && path.isNotEmpty && context.mounted) {
+          final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Descargado a: $path')),
+            SnackBar(content: Text(l10n.backupDownloadedTo(path))),
           );
         }
       },

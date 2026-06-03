@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Professional error state widget with retry action.
 class DFError extends StatelessWidget {
@@ -17,6 +18,8 @@ class DFError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppDimensions.s6),
@@ -30,7 +33,7 @@ class DFError extends StatelessWidget {
             ),
             const SizedBox(height: AppDimensions.s3),
             Text(
-              'Algo salió mal',
+              l10n.errorTitle,
               style: AppTypography.inter(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
@@ -49,7 +52,7 @@ class DFError extends StatelessWidget {
               const SizedBox(height: AppDimensions.s4),
               ElevatedButton(
                 onPressed: onRetry,
-                child: const Text('Reintentar'),
+                child: Text(l10n.retryButton),
               ),
             ],
           ],

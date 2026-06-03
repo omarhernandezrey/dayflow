@@ -1,3 +1,4 @@
+import 'package:dayflow/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,9 +15,10 @@ class MoreScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final unlockedCount = ref.watch(unlockedAchievementsCountProvider.select((v) => v.valueOrNull ?? 0));
     final themeMode = ref.watch(themeModeProvider);
-    final userName = ref.watch(authStateProvider.select((v) => v.valueOrNull?.name ?? 'Usuario'));
+    final userName = ref.watch(authStateProvider.select((v) => v.valueOrNull?.name ?? l10n.nameLabel));
     final userEmail = ref.watch(authStateProvider.select((v) => v.valueOrNull?.email ?? 'DayFlow User'));
     final userInitials = ref.watch(authStateProvider.select((v) => v.valueOrNull?.initials ?? 'U'));
 
@@ -32,7 +34,7 @@ class MoreScreen extends ConsumerWidget {
           ),
           children: [
             Text(
-              'Más',
+              l10n.moreTitle,
               style: AppTypography.inter(
                 fontSize: 28,
                 fontWeight: FontWeight.w700,
@@ -42,33 +44,33 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: AppDimensions.s5),
             _ProfileHeader(initials: userInitials, name: userName, email: userEmail),
             const SizedBox(height: AppDimensions.s5),
-            _MenuSection(title: 'Personalización', items: [
+            _MenuSection(title: l10n.personalizationSection, items: [
               _MenuItem(
                 icon: Icons.palette_outlined,
-                title: 'Apariencia',
-                subtitle: _themeLabel(themeMode),
+                title: l10n.appearanceTitle,
+                subtitle: _themeLabel(themeMode, l10n),
                 onTap: () => _showThemePicker(context, ref),
               ),
             ]),
-            _MenuSection(title: 'Datos', items: [
+            _MenuSection(title: l10n.dataSection, items: [
               _MenuItem(
                 icon: Icons.backup_outlined,
-                title: 'Copia de seguridad',
-                subtitle: 'Exportar y restaurar',
+                title: l10n.backupTitle,
+                subtitle: l10n.backupSubtitle,
                 onTap: () => context.push('/backup'),
               ),
               _MenuItem(
                 icon: Icons.file_download_outlined,
-                title: 'Exportar datos',
-                subtitle: 'CSV y PDF',
+                title: l10n.exportDataTitle,
+                subtitle: l10n.exportDataSubtitle,
                 onTap: () => context.push('/backup'),
               ),
             ]),
-            _MenuSection(title: 'Progreso', items: [
+            _MenuSection(title: l10n.progressSection, items: [
               _MenuItem(
                 icon: Icons.emoji_events_outlined,
-                title: 'Logros',
-                subtitle: '$unlockedCount desbloqueados',
+                title: l10n.achievementsTitle,
+                subtitle: l10n.achievementsUnlocked(unlockedCount),
                 trailing: unlockedCount > 0
                     ? Container(
                         padding: const EdgeInsets.symmetric(
@@ -94,15 +96,15 @@ class MoreScreen extends ConsumerWidget {
               _MenuItem(
                 icon: Icons.calendar_month_outlined,
                 title: 'Calendario',
-                subtitle: 'Vista mensual y semanal',
+                subtitle: l10n.calendarSubtitle,
                 onTap: () => context.push('/calendar'),
               ),
             ]),
-            _MenuSection(title: 'Cuenta', items: [
+            _MenuSection(title: l10n.accountSection, items: [
               _MenuItem(
                 icon: Icons.logout_rounded,
-                title: 'Cerrar sesión',
-                subtitle: 'Salir de la aplicación',
+                title: l10n.logoutTitle,
+                subtitle: l10n.logoutSubtitle,
                 iconColor: AppColors.danger,
                 onTap: () async {
                   await ref.read(authStateProvider.notifier).logout();
@@ -116,18 +118,19 @@ class MoreScreen extends ConsumerWidget {
     );
   }
 
-  String _themeLabel(ThemeModeOption mode) {
+  String _themeLabel(ThemeModeOption mode, AppLocalizations l10n) {
     switch (mode) {
       case ThemeModeOption.light:
-        return 'Claro';
+        return l10n.themeLight;
       case ThemeModeOption.dark:
-        return 'Oscuro';
+        return l10n.themeDark;
       case ThemeModeOption.system:
-        return 'Sistema';
+        return l10n.themeSystem;
     }
   }
 
   void _showThemePicker(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.surface,
@@ -141,7 +144,7 @@ class MoreScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Tema',
+                l10n.themeSheetTitle,
                 style: AppTypography.inter(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -157,8 +160,8 @@ class MoreScreen extends ConsumerWidget {
                               : Icons.brightness_auto_outlined,
                       color: AppColors.text,
                     ),
-                    title: Text(
-                      _themeLabel(mode),
+title: Text(
+                       _themeLabel(mode, l10n),
                       style: AppTypography.inter(fontSize: 15, fontWeight: FontWeight.w600),
                     ),
                     trailing: ref.watch(themeModeProvider) == mode

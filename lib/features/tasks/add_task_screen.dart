@@ -7,6 +7,7 @@ import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/df_date_utils.dart';
 import '../../domain/entities/task.dart';
+import '../../l10n/app_localizations.dart';
 import '../../presentation/providers/tasks_provider.dart';
 import '../../shared/widgets/df_app_bar.dart';
 
@@ -28,13 +29,6 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
   int _reminderIdx = 1; // 0=5min, 1=15min, 2=30min, 3=60min
 
   static const _reminderMins = [5, 15, 30, 60];
-  static const _reminderLabels = ['5 min', '15 min', '30 min', '60 min'];
-
-  static const _cats = [
-    _CatOpt(Icons.person_outline_rounded, 'Personal', AppColors.catPersonal, TaskCategory.personal),
-    _CatOpt(Icons.menu_book_outlined, 'Académica', AppColors.catAcademic, TaskCategory.academic),
-    _CatOpt(Icons.health_and_safety_outlined, 'Salud', AppColors.catHealth, TaskCategory.health),
-  ];
 
   bool get _isEditing => widget.task != null;
 
@@ -100,8 +94,9 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
   Future<void> _save() async {
     final title = _titleCtrl.text.trim();
     if (title.isEmpty) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El título es obligatorio')),
+        SnackBar(content: Text(l10n.taskTitleRequired)),
       );
       return;
     }
@@ -128,10 +123,23 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final reminderLabels = [
+      l10n.reminder5min,
+      l10n.reminder15min,
+      l10n.reminder30min,
+      l10n.reminder60min,
+    ];
+    final cats = [
+      _CatOpt(Icons.person_outline_rounded, l10n.labelPersonal, AppColors.catPersonal, TaskCategory.personal),
+      _CatOpt(Icons.menu_book_outlined, l10n.labelAcademic, AppColors.catAcademic, TaskCategory.academic),
+      _CatOpt(Icons.health_and_safety_outlined, l10n.labelHealth, AppColors.catHealth, TaskCategory.health),
+    ];
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: DFAppBar(
-        title: _isEditing ? 'Editar tarea' : 'Nueva tarea',
+        title: _isEditing ? l10n.editTaskTitle : l10n.addTaskTitle,
         showBack: true,
       ),
       body: SingleChildScrollView(
@@ -146,16 +154,16 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
           children: [
             // Title
             _Field(
-              label: 'Título',
+              label: l10n.taskTitleLabel,
               child: _inputBox(
                 child: TextField(
                   controller: _titleCtrl,
                   style: AppTypography.inter(fontSize: 15, fontWeight: FontWeight.w500),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
-                    hintText: 'Nombre de la actividad',
+                    hintText: l10n.taskTitleHint,
                   ),
                   cursorColor: AppColors.blue,
                 ),
@@ -164,18 +172,18 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
 
             // Description
             _Field(
-              label: 'Descripción',
+              label: l10n.taskDescLabel,
               child: _inputBox(
                 minHeight: 80,
                 child: TextField(
                   controller: _descCtrl,
                   maxLines: null,
                   style: AppTypography.inter(fontSize: 14, fontWeight: FontWeight.w500),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
-                    hintText: 'Descripción opcional…',
+                    hintText: l10n.taskDescHint,
                   ),
                   cursorColor: AppColors.blue,
                 ),
@@ -184,9 +192,9 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
 
             // Category
             _Field(
-              label: 'Categoría',
+              label: l10n.taskCategoryLabel,
               child: Row(
-                children: _cats.asMap().entries.map((e) {
+                children: cats.asMap().entries.map((e) {
                   final c = e.value;
                   final active = _cat == c.category;
                   return Expanded(
@@ -194,7 +202,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
                       onTap: () => setState(() => _cat = c.category),
                       child: Container(
                         margin: EdgeInsets.only(
-                          right: e.key < _cats.length - 1 ? AppDimensions.s2 : 0,
+                          right: e.key < cats.length - 1 ? AppDimensions.s2 : 0,
                         ),
                         padding: const EdgeInsets.symmetric(
                             vertical: AppDimensions.s4 - 2),
@@ -234,7 +242,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
               children: [
                 Expanded(
                   child: _Field(
-                    label: 'Fecha',
+                    label: l10n.taskDateLabel,
                     child: GestureDetector(
                       onTap: _pickDate,
                       child: _inputBox(
@@ -257,7 +265,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
                 const SizedBox(width: AppDimensions.s3),
                 Expanded(
                   child: _Field(
-                    label: 'Hora',
+                    label: l10n.taskTimeLabel,
                     child: GestureDetector(
                       onTap: _pickTime,
                       child: _inputBox(
@@ -282,11 +290,11 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
 
             // Reminder
             _Field(
-              label: 'Recordatorio',
+              label: l10n.taskReminderLabel,
               child: Wrap(
                 spacing: AppDimensions.s2,
                 runSpacing: AppDimensions.s2,
-                children: List.generate(_reminderLabels.length, (i) {
+                children: List.generate(reminderLabels.length, (i) {
                   final active = _reminderIdx == i;
                   return GestureDetector(
                     onTap: () => setState(() => _reminderIdx = i),
@@ -305,7 +313,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
                         borderRadius: BorderRadius.circular(AppDimensions.rPill),
                       ),
                       child: Text(
-                        '${_reminderLabels[i]} antes',
+                        l10n.reminderBefore(reminderLabels[i]),
                         style: AppTypography.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -338,7 +346,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  _isEditing ? 'Guardar cambios' : 'Guardar actividad',
+                  _isEditing ? l10n.saveTaskEdit : l10n.saveTaskCreate,
                   style: AppTypography.inter(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,

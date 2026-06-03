@@ -1,3 +1,4 @@
+import 'package:dayflow/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -59,16 +60,17 @@ class _BottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  static const _items = [
-    _NavItem(Icons.home_outlined, Icons.home_rounded, 'Inicio'),
-    _NavItem(Icons.check_box_outline_blank_rounded, Icons.check_box_rounded, 'Tareas'),
-    _NavItem(Icons.radio_button_unchecked_rounded, Icons.radio_button_checked_rounded, 'Hábitos'),
-    _NavItem(Icons.bar_chart_outlined, Icons.bar_chart_rounded, 'Stats'),
-    _NavItem(Icons.more_horiz_rounded, Icons.more_horiz_rounded, 'Más'),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final items = [
+      _NavItem(Icons.home_outlined, Icons.home_rounded, l10n.homeTab),
+      _NavItem(Icons.check_box_outline_blank_rounded, Icons.check_box_rounded, l10n.tasksTab),
+      _NavItem(Icons.radio_button_unchecked_rounded, Icons.radio_button_checked_rounded, l10n.habitsTab),
+      _NavItem(Icons.bar_chart_outlined, Icons.bar_chart_rounded, l10n.statsTab),
+      _NavItem(Icons.more_horiz_rounded, Icons.more_horiz_rounded, l10n.moreTab),
+    ];
+
     return Container(
       height: AppDimensions.bottomNav + MediaQuery.of(context).padding.bottom,
       decoration: const BoxDecoration(
@@ -76,8 +78,8 @@ class _BottomNav extends StatelessWidget {
         border: Border(top: BorderSide(color: AppColors.border)),
       ),
       child: Row(
-        children: List.generate(_items.length, (i) {
-          final item = _items[i];
+        children: List.generate(items.length, (i) {
+          final item = items[i];
           final active = currentIndex == i;
           return Expanded(
             child: Semantics(
@@ -128,21 +130,21 @@ class _DFDrawer extends StatelessWidget {
   const _DFDrawer({required this.ref});
   final WidgetRef ref;
 
-  static const _items = [
-    _DrawerItem(Icons.person_outline_rounded, 'Mi perfil', 'Datos personales', null, '/profile'),
-    _DrawerItem(Icons.emoji_events_outlined, 'Logros', 'Ver progreso', null, '/achievements'),
-    _DrawerItem(Icons.palette_outlined, 'Apariencia', 'Tema oscuro', null, null),
-    _DrawerItem(Icons.notifications_outlined, 'Notificaciones', 'Activadas', null, '/notifications'),
-    _DrawerItem(Icons.label_outline_rounded, 'Categorías', 'Personal, Académica, Salud', null, null),
-    _DrawerItem(Icons.shield_outlined, 'Privacidad y datos', 'Almacenamiento local', null, null),
-    _DrawerItem(Icons.help_outline_rounded, 'Ayuda y soporte', 'Centro de ayuda', null, null),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final initials = ref.watch(authStateProvider.select((v) => v.valueOrNull?.initials ?? 'U'));
-    final name = ref.watch(authStateProvider.select((v) => v.valueOrNull?.name ?? 'Usuario'));
+    final name = ref.watch(authStateProvider.select((v) => v.valueOrNull?.name ?? l10n.nameLabel));
     final email = ref.watch(authStateProvider.select((v) => v.valueOrNull?.email ?? ''));
+    final items = [
+      _DrawerItem(Icons.person_outline_rounded, l10n.navDrawerProfile, l10n.navDrawerProfileSub, null, '/profile'),
+      _DrawerItem(Icons.emoji_events_outlined, l10n.navDrawerAchievements, l10n.navDrawerAchievementsSub, null, '/achievements'),
+      _DrawerItem(Icons.palette_outlined, l10n.navDrawerAppearance, l10n.navDrawerAppearanceSub, null, null),
+      _DrawerItem(Icons.notifications_outlined, l10n.navDrawerNotifications, l10n.navDrawerNotificationsSub, null, '/notifications'),
+      _DrawerItem(Icons.label_outline_rounded, l10n.navDrawerCategories, l10n.navDrawerCategoriesSub, null, null),
+      _DrawerItem(Icons.shield_outlined, l10n.navDrawerPrivacy, l10n.navDrawerPrivacySub, null, null),
+      _DrawerItem(Icons.help_outline_rounded, l10n.navDrawerHelp, l10n.navDrawerHelpSub, null, null),
+    ];
 
     return Drawer(
       backgroundColor: AppColors.bg,
@@ -223,8 +225,8 @@ class _DFDrawer extends StatelessWidget {
                 vertical: AppDimensions.s2,
                 horizontal: AppDimensions.s3,
               ),
-              itemCount: _items.length,
-              itemBuilder: (_, i) => _drawerTile(context, _items[i]),
+              itemCount: items.length,
+              itemBuilder: (_, i) => _drawerTile(context, items[i]),
             ),
           ),
 
@@ -253,7 +255,7 @@ class _DFDrawer extends StatelessWidget {
                     const Icon(Icons.logout_rounded, color: AppColors.danger, size: 18),
                     const SizedBox(width: AppDimensions.s2),
                     Text(
-                      'Cerrar sesión',
+                      l10n.logoutTitle,
                       style: AppTypography.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,

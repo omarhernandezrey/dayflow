@@ -9,6 +9,7 @@ import '../../features/auth/splash_screen.dart';
 import '../../features/habits/add_habit_screen.dart';
 import '../../features/tasks/add_task_screen.dart';
 import '../../features/tasks/task_detail_screen.dart';
+import '../../l10n/app_localizations.dart';
 import '../../presentation/providers/auth_provider.dart';
 import '../../presentation/screens/achievements/achievements_screen.dart';
 import '../../presentation/screens/backup/backup_screen.dart';
@@ -103,8 +104,9 @@ class _ErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text('Pantalla no encontrada')),
+    final l10n = AppLocalizations.of(context)!;
+    return Scaffold(
+      body: Center(child: Text(l10n.pageNotFound)),
     );
   }
 }

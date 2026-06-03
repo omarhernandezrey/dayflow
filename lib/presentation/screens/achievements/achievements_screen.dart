@@ -1,3 +1,4 @@
+import 'package:dayflow/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -28,6 +29,7 @@ class AchievementsScreen extends ConsumerWidget {
             onRetry: () => ref.invalidate(achievementsProvider),
           ),
           data: (achievements) {
+            final l10n = AppLocalizations.of(context)!;
             final unlocked = achievements.where((a) => a.isUnlocked).toList();
             final locked = achievements.where((a) => !a.isUnlocked).toList();
 
@@ -40,7 +42,7 @@ class AchievementsScreen extends ConsumerWidget {
               ),
               children: [
                 Text(
-                  'Logros',
+                  l10n.achievementsTitle,
                   style: AppTypography.inter(
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
@@ -49,7 +51,7 @@ class AchievementsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppDimensions.s2),
                 Text(
-                  '${unlocked.length} de ${achievements.length} desbloqueados',
+                  l10n.achievementsUnlocked(unlocked.length, achievements.length),
                   style: AppTypography.inter(
                     fontSize: 14,
                     color: AppColors.textDim,
@@ -57,22 +59,22 @@ class AchievementsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppDimensions.s5),
                 if (unlocked.isNotEmpty) ...[
-                  _sectionTitle('Desbloqueados'),
+                  _sectionTitle(l10n.achievementsUnlockedTab),
                   const SizedBox(height: AppDimensions.s3),
                   ...unlocked.map((a) => _AchievementCard(achievement: a, isUnlocked: true)),
                   const SizedBox(height: AppDimensions.s5),
                 ],
                 if (locked.isNotEmpty) ...[
-                  _sectionTitle('Bloqueados'),
+                  _sectionTitle(l10n.achievementsLockedTab),
                   const SizedBox(height: AppDimensions.s3),
                   ...locked.map((a) => _AchievementCard(achievement: a, isUnlocked: false)),
                 ],
                 if (achievements.isEmpty)
-                  const DFEmpty(
-                    icon: Icons.emoji_events_outlined,
-                    title: 'Sin logros',
-                    subtitle: 'Completa tareas y hábitos para desbloquear logros',
-                  ),
+                   DFEmpty(
+                     icon: Icons.emoji_events_outlined,
+                     title: l10n.noAchievementsTitle,
+                     subtitle: l10n.noAchievementsSubtitle,
+                   ),
               ],
             );
           },

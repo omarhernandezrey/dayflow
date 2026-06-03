@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/routes/app_router.dart';
 import 'core/theme/app_light_theme.dart';
 import 'core/theme/app_theme.dart';
+import 'l10n/app_localizations.dart';
 import 'presentation/providers/theme_provider.dart';
 
 class DayFlowApp extends ConsumerWidget {
@@ -23,12 +24,13 @@ class DayFlowApp extends ConsumerWidget {
       themeMode: themeMode,
       routerConfig: router,
       localizationsDelegates: const [
-        ...GlobalMaterialLocalizations.delegates,
+        ...AppLocalizations.localizationsDelegates,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('es', 'ES'),
-        Locale('en', 'US'),
-      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('es', 'ES'),
     );
   }
 }

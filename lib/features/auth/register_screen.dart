@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
+import '../../l10n/app_localizations.dart';
 import '../../presentation/providers/auth_provider.dart';
 import 'auth_widgets.dart';
 
@@ -33,7 +34,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (!_accepted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debes aceptar los términos')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.termsRequired)),
       );
       return;
     }
@@ -52,6 +53,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final auth = ref.watch(authStateProvider);
     final isLoading = auth.isLoading;
 
@@ -75,7 +77,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 const DFLogo(size: 48),
                 const SizedBox(height: AppDimensions.s5),
                 Text(
-                  'Crea tu cuenta',
+                  l10n.registerTitle,
                   style: AppTypography.inter(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
@@ -85,7 +87,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppDimensions.s1 + 2),
                 Text(
-                  'Comienza a organizar tu día en menos de un minuto.',
+                  l10n.registerSubtitle,
                   style: AppTypography.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -95,33 +97,33 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 const SizedBox(height: AppDimensions.s5),
 
                 DFTextField(
-                  label: 'Nombre completo',
+                  label: l10n.nameLabel,
                   controller: _nameCtrl,
-                  hint: 'Tu nombre',
+                  hint: l10n.nameHint,
                   prefixIcon: Icons.person_outline_rounded,
                   textInputAction: TextInputAction.next,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'El nombre es obligatorio';
+                    if (v == null || v.trim().isEmpty) return l10n.nameRequired;
                     return null;
                   },
                 ),
                 const SizedBox(height: AppDimensions.s3 - 2),
                 DFTextField(
-                  label: 'Correo electrónico',
+                  label: l10n.emailLabel,
                   controller: _emailCtrl,
-                  hint: 'tu@email.com',
+                  hint: l10n.emailHint,
                   prefixIcon: Icons.mail_outline_rounded,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'El correo es obligatorio';
-                    if (!v.contains('@')) return 'Correo inválido';
+                    if (v == null || v.trim().isEmpty) return l10n.emailRequired;
+                    if (!v.contains('@')) return l10n.emailInvalid;
                     return null;
                   },
                 ),
                 const SizedBox(height: AppDimensions.s3 - 2),
                 DFTextField(
-                  label: 'Contraseña',
+                  label: l10n.passwordLabel,
                   controller: _passwordCtrl,
                   hint: '••••••••',
                   prefixIcon: Icons.shield_outlined,
@@ -129,14 +131,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _register(),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'La contraseña es obligatoria';
-                    if (v.length < 6) return 'Mínimo 6 caracteres';
+                    if (v == null || v.isEmpty) return l10n.passwordRequired;
+                    if (v.length < 6) return l10n.passwordMinLength;
                     return null;
                   },
                 ),
                 const SizedBox(height: AppDimensions.s2),
                 Text(
-                  'Mínimo 6 caracteres.',
+                  l10n.passwordMinLengthDot,
                   style: AppTypography.inter(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w500,
@@ -169,7 +171,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       const SizedBox(width: AppDimensions.s2 + 2),
                       Expanded(
                         child: Text(
-                          'Acepto los términos de servicio y la política de privacidad.',
+                          l10n.termsAccepted,
                           style: AppTypography.inter(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w500,
@@ -205,7 +207,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ],
 
                 DFPrimaryBtn(
-                  label: 'Crear cuenta',
+                  label: l10n.registerButton,
                   onTap: _register,
                   isLoading: isLoading,
                 ),
@@ -220,12 +222,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         color: AppColors.textDim,
                       ),
                       children: [
-                        const TextSpan(text: '¿Ya tienes cuenta? '),
+                        TextSpan(text: l10n.alreadyHaveAccountLogin),
                         WidgetSpan(
                           child: GestureDetector(
                             onTap: () => context.go('/login'),
                             child: Text(
-                              'Inicia sesión',
+                              l10n.loginLink,
                               style: AppTypography.inter(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w700,

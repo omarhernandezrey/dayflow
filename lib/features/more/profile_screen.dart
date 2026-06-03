@@ -6,6 +6,7 @@ import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
 import '../../domain/entities/achievement.dart';
 import '../../domain/entities/weekly_stats.dart';
+import '../../l10n/app_localizations.dart';
 import '../../presentation/providers/achievements_provider.dart';
 import '../../presentation/providers/auth_provider.dart';
 import '../../presentation/providers/habits_provider.dart';
@@ -17,6 +18,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final userName = ref.watch(authStateProvider.select((v) => v.valueOrNull?.name ?? 'Usuario'));
     final userInitials = ref.watch(authStateProvider.select((v) => v.valueOrNull?.initials ?? 'U'));
     final createdAt = ref.watch(authStateProvider.select((v) => v.valueOrNull?.createdAt));
@@ -75,7 +77,7 @@ class ProfileScreen extends ConsumerWidget {
                     )),
                 const SizedBox(height: 2),
                 Text(
-                    createdAt != null ? 'Miembro desde ${_formatMemberSince(createdAt)}' : 'Miembro reciente',
+                    createdAt != null ? l10n.memberSince(_formatMemberSince(createdAt, l10n)) : l10n.recentMember,
                     style: AppTypography.caption),
               ],
             ),
@@ -87,7 +89,7 @@ class ProfileScreen extends ConsumerWidget {
             children: [
               _StatTile(
                 value: '${streakAsync.valueOrNull ?? 0}',
-                label: 'Racha actual',
+                label: l10n.currentStreak,
               ),
               const SizedBox(width: AppDimensions.s2 + 2),
               _StatTile(
@@ -97,7 +99,7 @@ class ProfileScreen extends ConsumerWidget {
               const SizedBox(width: AppDimensions.s2 + 2),
               _StatTile(
                 value: '${achievementsAsync.valueOrNull?.where((a) => a.isUnlocked).length ?? 0}',
-                label: 'Logros',
+                label: l10n.achievementsTitle,
               ),
             ],
           ),
@@ -114,7 +116,7 @@ class ProfileScreen extends ConsumerWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: Text('Logros',
+                        child: Text(l10n.achievementsTitle,
                             style: AppTypography.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -199,11 +201,11 @@ class ProfileScreen extends ConsumerWidget {
             child: Column(
               children: [
                 _ShortcutTile(
-                    icon: Icons.settings_outlined, label: 'Configuración'),
-                _ShortcutTile(icon: Icons.shield_outlined, label: 'Privacidad'),
+                    icon: Icons.settings_outlined, label: l10n.settingsShortcut),
+                _ShortcutTile(icon: Icons.shield_outlined, label: l10n.privacyShortcut),
                 _ShortcutTile(
                     icon: Icons.help_outline_rounded,
-                    label: 'Ayuda',
+                    label: l10n.helpShortcut,
                     last: true),
               ],
             ),
@@ -213,12 +215,14 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  String _formatMemberSince(String isoDate) {
+  String _formatMemberSince(String isoDate, AppLocalizations l10n) {
     try {
       final date = DateTime.parse(isoDate);
-      const months = [
-        '', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-        'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+      final months = [
+        '', l10n.monthJanuary, l10n.monthFebruary, l10n.monthMarch,
+        l10n.monthApril, l10n.monthMay, l10n.monthJune,
+        l10n.monthJuly, l10n.monthAugust, l10n.monthSeptember,
+        l10n.monthOctober, l10n.monthNovember, l10n.monthDecember
       ];
       return '${months[date.month]} ${date.year}';
     } catch (_) {

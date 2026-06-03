@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:dayflow/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_typography.dart';
@@ -22,11 +23,12 @@ class TasksScreen extends ConsumerStatefulWidget {
 }
 
 class _TasksScreenState extends ConsumerState<TasksScreen> {
-  static const _filters = ['Todas', 'Personal', 'Académica', 'Salud'];
   static const _filterValues = [null, TaskCategory.personal, TaskCategory.academic, TaskCategory.health];
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final filters = [l10n.filterAll, l10n.labelPersonal, l10n.labelAcademic, l10n.labelHealth];
     final currentFilter = ref.watch(taskFilterProvider);
     final filterIndex = _filterValues.indexOf(currentFilter);
     final tasksAsync = ref.watch(filteredTasksProvider);
@@ -48,7 +50,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Tareas',
+                      l10n.tasksTab,
                       style: AppTypography.inter(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
@@ -78,7 +80,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: AppDimensions.s5),
-                itemCount: _filters.length,
+                itemCount: filters.length,
                 separatorBuilder: (context, index) => const SizedBox(width: AppDimensions.s2),
                 itemBuilder: (_, i) {
                   final active = filterIndex == i;
@@ -98,7 +100,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                         ),
                       ),
                       child: Text(
-                        _filters[i],
+                        filters[i],
                         style: AppTypography.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -124,9 +126,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   if (tasks.isEmpty) {
                     return DFEmpty(
                       icon: Icons.check_box_outline_blank_rounded,
-                      title: 'No tienes tareas',
-                      subtitle: 'Agrega tu primera tarea para empezar',
-                      actionLabel: 'Agregar tarea',
+                      title: l10n.noTasksTitle,
+                      subtitle: l10n.noTasksSubtitle,
+                      actionLabel: l10n.noTasksAction,
                       onAction: () => context.push('/add-task'),
                     );
                   }
@@ -146,15 +148,15 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                       AppDimensions.s6,
                     ),
                     children: [
-                      if (todayTasks.isNotEmpty) _TaskGroup(title: 'Hoy', tasks: todayTasks),
+                      if (todayTasks.isNotEmpty) _TaskGroup(title: l10n.today, tasks: todayTasks),
                       if (tomorrowTasks.isNotEmpty) ...[
                         if (todayTasks.isNotEmpty) const SizedBox(height: AppDimensions.s5),
-                        _TaskGroup(title: 'Mañana', tasks: tomorrowTasks),
+                        _TaskGroup(title: l10n.tomorrow, tasks: tomorrowTasks),
                       ],
                       if (otherTasks.isNotEmpty) ...[
                         if (todayTasks.isNotEmpty || tomorrowTasks.isNotEmpty)
                           const SizedBox(height: AppDimensions.s5),
-                        _TaskGroup(title: 'Más adelante', tasks: otherTasks),
+                        _TaskGroup(title: l10n.later, tasks: otherTasks),
                       ],
                     ],
                   );
@@ -270,8 +272,8 @@ Container(
            ],
          ),
        ),
-     );
-   }
+    );
+  }
 }
 
 class _CircleCheck extends StatelessWidget {
@@ -281,9 +283,10 @@ class _CircleCheck extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Semantics(
       button: true,
-      label: done ? 'Tarea completada' : 'Marcar tarea como completada',
+      label: done ? l10n.taskCompleted : l10n.taskMarkComplete,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         width: 22,

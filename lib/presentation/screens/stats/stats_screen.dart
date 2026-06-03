@@ -1,3 +1,4 @@
+import 'package:dayflow/l10n/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,6 +40,7 @@ class _StatsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final pct = stats.completionPercentage;
     final completed = stats.completedTasks;
     final pending = stats.pendingTasks;
@@ -54,7 +56,7 @@ class _StatsBody extends StatelessWidget {
       ),
       children: [
         Text(
-          'Estadísticas',
+          l10n.statsTitle,
           style: AppTypography.inter(
             fontSize: 28,
             fontWeight: FontWeight.w700,
@@ -74,7 +76,7 @@ class _StatsBody extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                'Esta semana',
+                l10n.statsWeek,
                 style: AppTypography.inter(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w700,
@@ -122,7 +124,7 @@ class _StatsBody extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Completado',
+                          l10n.completedPercent,
                           style: AppTypography.inter(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -143,11 +145,11 @@ class _StatsBody extends StatelessWidget {
         // Stat row
         Row(
           children: [
-            _StatCard(value: '$completed', label: 'Completadas', color: AppColors.catHealth),
+            _StatCard(value: '$completed', label: l10n.completedLabel, color: AppColors.catHealth),
             const SizedBox(width: AppDimensions.s2 + 2),
-            _StatCard(value: '$pending', label: 'Pendientes', color: AppColors.catPersonal),
+            _StatCard(value: '$pending', label: l10n.pendingLabel, color: AppColors.catPersonal),
             const SizedBox(width: AppDimensions.s2 + 2),
-            _StatCard(value: '$total', label: 'Total', color: AppColors.catAcademic),
+            _StatCard(value: '$total', label: l10n.statsTotal, color: AppColors.catAcademic),
           ],
         ),
 
@@ -165,7 +167,7 @@ class _StatsBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Cumplimiento semanal',
+                l10n.weeklyStats,
                 style: AppTypography.inter(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
@@ -178,7 +180,7 @@ class _StatsBody extends StatelessWidget {
                 child: bars.isEmpty
                     ? Center(
                         child: Text(
-                          'Sin datos esta semana',
+                          l10n.noDataWeek,
                           style: AppTypography.inter(
                             fontSize: 13,
                             color: AppColors.textMute,

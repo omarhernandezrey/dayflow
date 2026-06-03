@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
+import '../../l10n/app_localizations.dart';
 
 // ─── Logo ─────────────────────────────────────────────────────
 class DFLogo extends StatelessWidget {
@@ -42,7 +43,7 @@ class DFBackBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'Volver',
+      label: AppLocalizations.of(context)!.backBtn,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppDimensions.rSm + 2),

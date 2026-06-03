@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
 import '../../domain/entities/habit.dart';
+import '../../l10n/app_localizations.dart';
 import '../../presentation/providers/habits_provider.dart';
 import '../../shared/widgets/df_app_bar.dart';
 
@@ -34,8 +35,6 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
     _IconOpt('book', Icons.menu_book_outlined, '#F59E0B'),
     _IconOpt('sparkle', Icons.auto_awesome_outlined, '#F472B6'),
   ];
-
-  static const _dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
   bool get _isEditing => widget.habit != null;
 
@@ -68,11 +67,23 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
 
   Color get _activeColor => _hexColor(_activeIconOpt.colorHex);
 
+  String _freqLabel(HabitFrequency f, AppLocalizations l10n) {
+    switch (f) {
+      case HabitFrequency.daily:
+        return l10n.frequencyDaily;
+      case HabitFrequency.weekly:
+        return l10n.frequencyWeekly;
+      case HabitFrequency.custom:
+        return l10n.frequencyCustom;
+    }
+  }
+
   Future<void> _save() async {
     final title = _titleCtrl.text.trim();
     if (title.isEmpty) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El nombre es obligatorio')),
+        SnackBar(content: Text(l10n.habitNameRequired)),
       );
       return;
     }
@@ -100,10 +111,16 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final dayLabels = [
+      l10n.dayMon, l10n.dayTue, l10n.dayWed,
+      l10n.dayThu, l10n.dayFri, l10n.daySat, l10n.daySun,
+    ];
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: DFAppBar(
-        title: _isEditing ? 'Editar hábito' : 'Nuevo hábito',
+        title: _isEditing ? l10n.editHabitTitle : l10n.addHabitTitle,
         showBack: true,
       ),
       body: SingleChildScrollView(
@@ -131,7 +148,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
             ),
 
             // Name
-            _FieldLabel('Nombre del hábito'),
+            _FieldLabel(l10n.habitNameLabel),
             Container(
               padding: const EdgeInsets.all(AppDimensions.s4 - 2),
               decoration: BoxDecoration(
@@ -142,18 +159,18 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
               child: TextField(
                 controller: _titleCtrl,
                 style: AppTypography.inter(fontSize: 15, fontWeight: FontWeight.w500),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.zero,
-                  hintText: 'Nombre del hábito…',
+                  hintText: l10n.habitNameHint,
                 ),
                 cursorColor: AppColors.blue,
               ),
             ),
 
             // Icon selector
-            _FieldLabel('Icono'),
+            _FieldLabel(l10n.habitIconLabel),
             Wrap(
               spacing: AppDimensions.s2 + 2,
               runSpacing: AppDimensions.s2 + 2,
@@ -183,7 +200,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
             ),
 
             // Frequency
-            _FieldLabel('Frecuencia'),
+            _FieldLabel(l10n.habitFrequencyLabel),
             Row(
               children: HabitFrequency.values.asMap().entries.map((e) {
                 final f = e.value;
@@ -208,7 +225,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        f.label,
+                        _freqLabel(f, l10n),
                         style: AppTypography.inter(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
@@ -247,7 +264,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        _dayLabels[i],
+                        dayLabels[i],
                         style: AppTypography.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
@@ -261,7 +278,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
             ),
 
             // Goal
-            _FieldLabel('Meta diaria'),
+            _FieldLabel(l10n.habitGoalLabel),
             Row(
               children: [
                 _QtyBtn(
@@ -281,7 +298,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      '${_goal.toStringAsFixed(_goal == _goal.toInt() ? 0 : 1)} ${_goal == 1.0 ? 'vez' : 'veces'}',
+                      '${_goal.toStringAsFixed(_goal == _goal.toInt() ? 0 : 1)} ${_goal == 1.0 ? l10n.timeOnce : l10n.timeTimes}',
                       style: AppTypography.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -318,7 +335,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  _isEditing ? 'Guardar cambios' : 'Crear hábito',
+                  _isEditing ? l10n.saveHabitEdit : l10n.saveHabitCreate,
                   style: AppTypography.inter(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
