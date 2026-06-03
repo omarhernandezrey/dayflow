@@ -1,776 +1,1537 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart' as intl;
 
-class AppLocalizations {
-  final Locale locale;
+import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
 
-  AppLocalizations(this.locale);
+// ignore_for_file: type=lint
+
+/// Callers can lookup localized strings with an instance of AppLocalizations
+/// returned by `AppLocalizations.of(context)`.
+///
+/// Applications need to include `AppLocalizations.delegate()` in their app's
+/// `localizationDelegates` list, and the locales they support in the app's
+/// `supportedLocales` list. For example:
+///
+/// ```dart
+/// import 'l10n/app_localizations.dart';
+///
+/// return MaterialApp(
+///   localizationsDelegates: AppLocalizations.localizationsDelegates,
+///   supportedLocales: AppLocalizations.supportedLocales,
+///   home: MyApplicationHome(),
+/// );
+/// ```
+///
+/// ## Update pubspec.yaml
+///
+/// Please make sure to update your pubspec.yaml to include the following
+/// packages:
+///
+/// ```yaml
+/// dependencies:
+///   # Internationalization support.
+///   flutter_localizations:
+///     sdk: flutter
+///   intl: any # Use the pinned version from flutter_localizations
+///
+///   # Rest of dependencies
+/// ```
+///
+/// ## iOS Applications
+///
+/// iOS applications define key application metadata, including supported
+/// locales, in an Info.plist file that is built into the application bundle.
+/// To configure the locales supported by your app, you’ll need to edit this
+/// file.
+///
+/// First, open your project’s ios/Runner.xcworkspace Xcode workspace file.
+/// Then, in the Project Navigator, open the Info.plist file under the Runner
+/// project’s Runner folder.
+///
+/// Next, select the Information Property List item, select Add Item from the
+/// Editor menu, then select Localizations from the pop-up menu.
+///
+/// Select and expand the newly-created Localizations item then, for each
+/// locale your application supports, add a new item and select the locale
+/// you wish to add from the pop-up menu in the Value field. This list should
+/// be consistent with the languages listed in the AppLocalizations.supportedLocales
+/// property.
+abstract class AppLocalizations {
+  AppLocalizations(String locale)
+      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+
+  final String localeName;
 
   static AppLocalizations? of(BuildContext context) {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = [
-    AppLocalizationsDelegate(),
-    DefaultMaterialLocalizations.delegate,
-    DefaultWidgetsLocalizations.delegate,
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
+
+  /// A list of this localizations delegate along with the default localizations
+  /// delegates.
+  ///
+  /// Returns a list of localizations delegates containing this delegate along with
+  /// GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate,
+  /// and GlobalWidgetsLocalizations.delegate.
+  ///
+  /// Additional delegates can be added by appending to this list in
+  /// MaterialApp. This list does not have to be used at all if a custom list
+  /// of delegates is preferred or required.
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
   ];
 
-  static const List<Locale> supportedLocales = [
-    Locale('es', 'ES'),
-    Locale('en', 'US'),
+  /// A list of this localizations delegate's supported locales.
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('es')
   ];
 
-  static final Map<String, Map<String, String>> _localizedValues = {
-    'es': {
-      'appName': 'DayFlow',
-      'loginTitle': '¡Hola de nuevo!',
-      'loginSubtitle': 'Inicia sesión para continuar con tu progreso.',
-      'loginButton': 'Iniciar sesión',
-      'registerButton': 'Regístrate',
-      'forgotPassword': '¿Olvidaste tu contraseña?',
-      'biometricPrompt': 'Usar biometría',
-      'noUserRegistered': 'No hay usuario registrado',
-      'emailLabel': 'Correo electrónico',
-      'emailHint': 'tu@email.com',
-      'passwordLabel': 'Contraseña',
-      'passwordHint': '••••••••',
-      'emailRequired': 'El correo es obligatorio',
-      'emailInvalid': 'Correo inválido',
-      'passwordRequired': 'La contraseña es obligatoria',
-      'passwordMinLength': 'Mínimo 6 caracteres',
-      'passwordMinLengthDot': 'Mínimo 6 caracteres.',
-      'nameLabel': 'Nombre completo',
-      'nameRequired': 'El nombre es obligatorio',
-      'nameHint': 'Tu nombre',
-      'registerTitle': 'Crear cuenta',
-      'registerSubtitle': 'Comienza a organizar tu día en menos de un minuto.',
-      'alreadyHaveAccount': '¿Aún no tienes cuenta? ',
-      'alreadyHaveAccountLogin': '¿Ya tienes cuenta? ',
-      'loginLink': 'Inicia sesión',
-      'termsAccepted': 'Acepto los términos de servicio y la política de privacidad.',
-      'termsRequired': 'Debes aceptar los términos',
-      'logoutConfirm': '¿Cerrar sesión?',
-      'logoutMessage': 'Perderás el acceso hasta que inicies sesión de nuevo.',
-      'cancelButton': 'Cancelar',
-      'confirmButton': 'Confirmar',
-      'deleteButton': 'Eliminar',
-      'saveButton': 'Guardar',
-      'homeTab': 'Inicio',
-      'tasksTab': 'Tareas',
-      'habitsTab': 'Hábitos',
-      'statsTab': 'Stats',
-      'moreTab': 'Más',
-      'helloTitle': '¡Hola!',
-      'upcomingActivities': 'Próximas actividades',
-      'noActivitiesToday': 'No tienes actividades pendientes hoy',
-      'goodJobDay': '¡Buen trabajo! Disfruta tu día.',
-      'totalActivities': 'Actividades\ntotales',
-      'addTaskTitle': 'Nueva tarea',
-      'editTaskTitle': 'Editar tarea',
-      'taskTitleLabel': 'Título',
-      'taskTitleHint': 'Nombre de la actividad',
-      'taskDescLabel': 'Descripción',
-      'taskDescHint': 'Descripción opcional…',
-      'taskCategoryLabel': 'Categoría',
-      'taskDateLabel': 'Fecha',
-      'taskTimeLabel': 'Hora',
-      'taskReminderLabel': 'Recordatorio',
-      'saveTaskCreate': 'Guardar actividad',
-      'saveTaskEdit': 'Guardar cambios',
-      'taskTitleRequired': 'El título es obligatorio',
-      'addHabitTitle': 'Nuevo hábito',
-      'editHabitTitle': 'Editar hábito',
-      'habitNameLabel': 'Nombre del hábito',
-      'habitNameHint': 'Nombre del hábito…',
-      'habitGoalLabel': 'Meta diaria',
-      'habitUnitLabel': 'Unidad',
-      'habitFrequencyLabel': 'Frecuencia',
-      'habitIconLabel': 'Icono',
-      'saveHabitCreate': 'Crear hábito',
-      'saveHabitEdit': 'Guardar cambios',
-      'habitNameRequired': 'El nombre es obligatorio',
-      'streakLabel': 'Racha',
-      'globalStreakLabel': 'Racha global',
-      'dailyStreak': 'RACHA DIARIA',
-      'daysInARow': 'días seguidos',
-      'completedLabel': 'Completado',
-      'completedExclamation': '¡Completado!',
-      'pendingLabel': 'Pendiente',
-      'noTasksTitle': 'No tienes tareas',
-      'noTasksSubtitle': 'Agrega tu primera tarea para empezar',
-      'noTasksAction': 'Agregar tarea',
-      'filterAll': 'Todas',
-      'today': 'Hoy',
-      'tomorrow': 'Mañana',
-      'later': 'Más adelante',
-      'taskCompleted': 'Tarea completada',
-      'taskMarkComplete': 'Marcar tarea como completada',
-      'noHabitsTitle': 'No tienes hábitos para hoy',
-      'noHabitsSubtitle': 'Crea un hábito y empieza tu racha',
-      'noHabitsAction': 'Crear hábito',
-      'todayHabits': 'Hábitos de hoy',
-      'allMyHabits': 'Todos mis hábitos',
-      'deleteHabit': 'Eliminar hábito',
-      'labelPersonal': 'Personal',
-      'labelAcademic': 'Académica',
-      'labelHealth': 'Salud',
-      'frequencyDaily': 'Diario',
-      'frequencyWeekly': 'Semanal',
-      'frequencyCustom': 'Personalizado',
-      'reminder5min': '5 min',
-      'reminder15min': '15 min',
-      'reminder30min': '30 min',
-      'reminder60min': '60 min',
-      'timeOnce': 'vez',
-      'timeTimes': 'veces',
-      'dayMon': 'L',
-      'dayTue': 'M',
-      'dayWed': 'X',
-      'dayThu': 'J',
-      'dayFri': 'V',
-      'daySat': 'S',
-      'daySun': 'D',
-      'statsTitle': 'Estadísticas',
-      'completedPercent': 'Completado',
-      'weeklyStats': 'Cumplimiento semanal',
-      'noDataWeek': 'Sin datos esta semana',
-      'statsTotal': 'Total',
-      'statsWeek': 'Esta semana',
-      'achievementsTitle': 'Logros',
-      'achievementsUnlocked': 'desbloqueados',
-      'achievementsUnlockedTab': 'Desbloqueados',
-      'achievementsLockedTab': 'Bloqueados',
-      'noAchievementsTitle': 'Sin logros',
-      'noAchievementsSubtitle': 'Completa tareas y hábitos para desbloquear logros',
-      'moreTitle': 'Más',
-      'personalizationSection': 'Personalización',
-      'appearanceTitle': 'Apariencia',
-      'themeLight': 'Claro',
-      'themeDark': 'Oscuro',
-      'themeSystem': 'Sistema',
-      'themeSheetTitle': 'Tema',
-      'dataSection': 'Datos',
-      'backupTitle': 'Copia de seguridad',
-      'backupSubtitle': 'Exportar y restaurar',
-      'exportDataTitle': 'Exportar datos',
-      'exportDataSubtitle': 'CSV y PDF',
-      'progressSection': 'Progreso',
-      'calendarTitle': 'Calendario',
-      'calendarSubtitle': 'Vista mensual y semanal',
-      'accountSection': 'Cuenta',
-      'logoutTitle': 'Cerrar sesión',
-      'logoutSubtitle': 'Salir de la aplicación',
-      'profileTitle': 'Perfil',
-      'recentMember': 'Miembro reciente',
-      'currentStreak': 'Racha actual',
-      'achievementsCount': 'Logros',
-      'settingsShortcut': 'Configuración',
-      'privacyShortcut': 'Privacidad',
-      'helpShortcut': 'Ayuda',
-      'backupLocalSection': 'LOCAL',
-      'backupExportAllSubtitle': 'Exporta todas tus tareas y hábitos',
-      'backupReportSubtitle': 'Genera un reporte visual',
-      'backupFullSubtitle': 'Copia completa de la base de datos',
-      'backupDriveSection': 'GOOGLE DRIVE',
-      'backupConnectDrive': 'Conectar con Google Drive',
-      'backupSyncSubtitle': 'Sincroniza tus backups en la nube',
-      'backupUploadDrive': 'Subir backup a Drive',
-      'backupUploadSubtitle': 'Crea backup local y súbelo',
-      'backupDisconnectDrive': 'Desconectar Google Drive',
-      'backupSignOutDrive': 'Cerrar sesión de Google',
-      'noDriveBackups': 'No hay backups en Drive',
-      'driveBackups': 'Backups en Drive',
-      'backupSelectZip': 'Selecciona un archivo .zip',
-      'backupDefaultName': 'Backup',
-      'exportCsv': 'Exportar a CSV',
-      'exportPdf': 'Exportar a PDF',
-      'createBackup': 'Crear backup ZIP',
-      'restoreBackupLocal': 'Restaurar backup local',
-      'taskDetailTitle': 'Detalle',
-      'taskDetailReminder': 'minutos antes',
-      'taskDetailStatus': 'Estado',
-      'taskDetailCompleted': 'Completada ✓',
-      'taskDetailEdit': 'Editar',
-      'taskDetailComplete': 'Completar',
-      'taskDetailCompletedAction': 'Completada',
-      'splashTagline': 'Organiza tu día.\nConstruye mejores hábitos.',
-      'splashOffline': 'Sin conexión',
-      'splashPrivate': '100% privado',
-      'splashReminders': 'Recordatorios',
-      'splashGetStarted': 'Comenzar',
-      'splashHaveAccount': 'Ya tengo una cuenta',
-      'splashTermsPrefix': 'Al continuar aceptas los ',
-      'splashTermsLink': 'Términos',
-      'splashTermsAnd': ' y la ',
-      'splashPrivacyLink': 'Política de privacidad',
-      'forgotPasswordTitle': 'Recupera tu acceso',
-      'forgotPasswordBody': 'DayFlow funciona de forma offline. Si olvidaste tu contraseña, no podemos enviar un correo de recuperación. Te recomendamos crear una nueva cuenta.',
-      'forgotPasswordBack': 'Volver a iniciar sesión',
-      'forgotPasswordCreateAccount': 'Crear nueva cuenta',
-      'backBtn': 'Volver',
-      'biometricLoginLabel': 'Iniciar sesión con biometría',
-      'navDrawerProfile': 'Mi perfil',
-      'navDrawerProfileSub': 'Datos personales',
-      'navDrawerAchievements': 'Logros',
-      'navDrawerAchievementsSub': 'Ver progreso',
-      'navDrawerAppearance': 'Apariencia',
-      'navDrawerAppearanceSub': 'Tema oscuro',
-      'navDrawerNotifications': 'Notificaciones',
-      'navDrawerNotificationsSub': 'Activadas',
-      'navDrawerCategories': 'Categorías',
-      'navDrawerCategoriesSub': 'Personal, Académica, Salud',
-      'navDrawerPrivacy': 'Privacidad y datos',
-      'navDrawerPrivacySub': 'Almacenamiento local',
-      'navDrawerHelp': 'Ayuda y soporte',
-      'navDrawerHelpSub': 'Centro de ayuda',
-      'navDrawerLogout': 'Cerrar sesión',
-      'pageNotFound': 'Pantalla no encontrada',
-      'noPendingTasks': 'Sin tareas pendientes',
-      'errorTitle': 'Algo salió mal',
-      'retryButton': 'Reintentar',
-      'validationNameEmpty': 'El nombre es obligatorio',
-      'validationEmailInvalid': 'Correo electrónico inválido',
-      'validationPasswordShort': 'La contraseña debe tener al menos 6 caracteres',
-      'validationHabitTitle': 'El nombre del hábito es obligatorio',
-      'validationHabitGoal': 'La meta debe ser mayor a 0',
-      'validationTaskTitle': 'El título es obligatorio',
-      'validationTaskDate': 'La fecha y hora son obligatorias',
-      'emailInUse': 'Ya existe una cuenta con este correo',
-      'invalidCredentials': 'Correo o contraseña incorrectos',
-      'sessionRestoreError': 'Error al restaurar sesión',
-      'monthJanuary': 'enero',
-      'monthFebruary': 'febrero',
-      'monthMarch': 'marzo',
-      'monthApril': 'abril',
-      'monthMay': 'mayo',
-      'monthJune': 'junio',
-      'monthJuly': 'julio',
-      'monthAugust': 'agosto',
-      'monthSeptember': 'septiembre',
-      'monthOctober': 'octubre',
-      'monthNovember': 'noviembre',
-      'monthDecember': 'diciembre',
-    },
-    'en': {
-      'appName': 'DayFlow',
-      'loginTitle': 'Welcome back!',
-      'loginSubtitle': 'Sign in to continue your progress.',
-      'loginButton': 'Sign in',
-      'registerButton': 'Sign up',
-      'forgotPassword': 'Forgot your password?',
-      'biometricPrompt': 'Use biometrics',
-      'noUserRegistered': 'No registered user',
-      'emailLabel': 'Email',
-      'emailHint': 'you@email.com',
-      'passwordLabel': 'Password',
-      'passwordHint': '••••••••',
-      'emailRequired': 'Email is required',
-      'emailInvalid': 'Invalid email',
-      'passwordRequired': 'Password is required',
-      'passwordMinLength': 'Minimum 6 characters',
-      'passwordMinLengthDot': 'Minimum 6 characters.',
-      'nameLabel': 'Full name',
-      'nameRequired': 'Name is required',
-      'nameHint': 'Your name',
-      'registerTitle': 'Create account',
-      'registerSubtitle': 'Start organizing your day in less than a minute.',
-      'alreadyHaveAccount': "Don't have an account yet? ",
-      'alreadyHaveAccountLogin': 'Already have an account? ',
-      'loginLink': 'Sign in',
-      'termsAccepted': 'I accept the terms of service and privacy policy.',
-      'termsRequired': 'You must accept the terms',
-      'logoutConfirm': 'Log out?',
-      'logoutMessage': 'You will lose access until you sign in again.',
-      'cancelButton': 'Cancel',
-      'confirmButton': 'Confirm',
-      'deleteButton': 'Delete',
-      'saveButton': 'Save',
-      'homeTab': 'Home',
-      'tasksTab': 'Tasks',
-      'habitsTab': 'Habits',
-      'statsTab': 'Stats',
-      'moreTab': 'More',
-      'helloTitle': 'Hello!',
-      'upcomingActivities': 'Upcoming activities',
-      'noActivitiesToday': 'No pending activities today',
-      'goodJobDay': 'Great job! Enjoy your day.',
-      'totalActivities': 'Total\nactivities',
-      'addTaskTitle': 'New task',
-      'editTaskTitle': 'Edit task',
-      'taskTitleLabel': 'Title',
-      'taskTitleHint': 'Activity name',
-      'taskDescLabel': 'Description',
-      'taskDescHint': 'Optional description…',
-      'taskCategoryLabel': 'Category',
-      'taskDateLabel': 'Date',
-      'taskTimeLabel': 'Time',
-      'taskReminderLabel': 'Reminder',
-      'saveTaskCreate': 'Save activity',
-      'saveTaskEdit': 'Save changes',
-      'taskTitleRequired': 'Title is required',
-      'addHabitTitle': 'New habit',
-      'editHabitTitle': 'Edit habit',
-      'habitNameLabel': 'Habit name',
-      'habitNameHint': 'Habit name…',
-      'habitGoalLabel': 'Daily goal',
-      'habitUnitLabel': 'Unit',
-      'habitFrequencyLabel': 'Frequency',
-      'habitIconLabel': 'Icon',
-      'saveHabitCreate': 'Create habit',
-      'saveHabitEdit': 'Save changes',
-      'habitNameRequired': 'Habit name is required',
-      'streakLabel': 'Streak',
-      'globalStreakLabel': 'Global streak',
-      'dailyStreak': 'DAILY STREAK',
-      'daysInARow': 'days in a row',
-      'completedLabel': 'Completed',
-      'completedExclamation': 'Completed!',
-      'pendingLabel': 'Pending',
-      'noTasksTitle': 'You have no tasks',
-      'noTasksSubtitle': 'Add your first task to get started',
-      'noTasksAction': 'Add task',
-      'filterAll': 'All',
-      'today': 'Today',
-      'tomorrow': 'Tomorrow',
-      'later': 'Later',
-      'taskCompleted': 'Task completed',
-      'taskMarkComplete': 'Mark task as complete',
-      'noHabitsTitle': 'No habits for today',
-      'noHabitsSubtitle': 'Create a habit and start your streak',
-      'noHabitsAction': 'Create habit',
-      'todayHabits': "Today's habits",
-      'allMyHabits': 'All my habits',
-      'deleteHabit': 'Delete habit',
-      'labelPersonal': 'Personal',
-      'labelAcademic': 'Academic',
-      'labelHealth': 'Health',
-      'frequencyDaily': 'Daily',
-      'frequencyWeekly': 'Weekly',
-      'frequencyCustom': 'Custom',
-      'reminder5min': '5 min',
-      'reminder15min': '15 min',
-      'reminder30min': '30 min',
-      'reminder60min': '60 min',
-      'timeOnce': 'time',
-      'timeTimes': 'times',
-      'dayMon': 'M',
-      'dayTue': 'T',
-      'dayWed': 'W',
-      'dayThu': 'T',
-      'dayFri': 'F',
-      'daySat': 'S',
-      'daySun': 'S',
-      'statsTitle': 'Statistics',
-      'completedPercent': 'Completed',
-      'weeklyStats': 'Weekly completion',
-      'noDataWeek': 'No data this week',
-      'statsTotal': 'Total',
-      'statsWeek': 'This week',
-      'achievementsTitle': 'Achievements',
-      'achievementsUnlocked': 'unlocked',
-      'achievementsUnlockedTab': 'Unlocked',
-      'achievementsLockedTab': 'Locked',
-      'noAchievementsTitle': 'No achievements',
-      'noAchievementsSubtitle': 'Complete tasks and habits to unlock achievements',
-      'moreTitle': 'More',
-      'personalizationSection': 'Personalization',
-      'appearanceTitle': 'Appearance',
-      'themeLight': 'Light',
-      'themeDark': 'Dark',
-      'themeSystem': 'System',
-      'themeSheetTitle': 'Theme',
-      'dataSection': 'Data',
-      'backupTitle': 'Backup',
-      'backupSubtitle': 'Export and restore',
-      'exportDataTitle': 'Export data',
-      'exportDataSubtitle': 'CSV and PDF',
-      'progressSection': 'Progress',
-      'calendarTitle': 'Calendar',
-      'calendarSubtitle': 'Monthly and weekly view',
-      'accountSection': 'Account',
-      'logoutTitle': 'Log out',
-      'logoutSubtitle': 'Leave the app',
-      'profileTitle': 'Profile',
-      'recentMember': 'Recent member',
-      'currentStreak': 'Current streak',
-      'achievementsCount': 'Achievements',
-      'settingsShortcut': 'Settings',
-      'privacyShortcut': 'Privacy',
-      'helpShortcut': 'Help',
-      'backupLocalSection': 'LOCAL',
-      'backupExportAllSubtitle': 'Export all your tasks and habits',
-      'backupReportSubtitle': 'Generate a visual report',
-      'backupFullSubtitle': 'Full database copy',
-      'backupDriveSection': 'GOOGLE DRIVE',
-      'backupConnectDrive': 'Connect to Google Drive',
-      'backupSyncSubtitle': 'Sync your backups to the cloud',
-      'backupUploadDrive': 'Upload backup to Drive',
-      'backupUploadSubtitle': 'Create local backup and upload',
-      'backupDisconnectDrive': 'Disconnect Google Drive',
-      'backupSignOutDrive': 'Sign out of Google',
-      'noDriveBackups': 'No backups on Drive',
-      'driveBackups': 'Backups on Drive',
-      'backupSelectZip': 'Select a .zip file',
-      'backupDefaultName': 'Backup',
-      'exportCsv': 'Export to CSV',
-      'exportPdf': 'Export to PDF',
-      'createBackup': 'Create ZIP backup',
-      'restoreBackupLocal': 'Restore local backup',
-      'taskDetailTitle': 'Detail',
-      'taskDetailReminder': 'minutes before',
-      'taskDetailStatus': 'Status',
-      'taskDetailCompleted': 'Completed ✓',
-      'taskDetailEdit': 'Edit',
-      'taskDetailComplete': 'Complete',
-      'taskDetailCompletedAction': 'Completed',
-      'splashTagline': 'Organize your day.\nBuild better habits.',
-      'splashOffline': 'Offline',
-      'splashPrivate': '100% private',
-      'splashReminders': 'Reminders',
-      'splashGetStarted': 'Get started',
-      'splashHaveAccount': 'I already have an account',
-      'splashTermsPrefix': 'By continuing you agree to the ',
-      'splashTermsLink': 'Terms',
-      'splashTermsAnd': ' and the ',
-      'splashPrivacyLink': 'Privacy Policy',
-      'forgotPasswordTitle': 'Recover your access',
-      'forgotPasswordBody': 'DayFlow works offline. If you forgot your password, we can\'t send a recovery email. We recommend creating a new account.',
-      'forgotPasswordBack': 'Sign in again',
-      'forgotPasswordCreateAccount': 'Create a new account',
-      'backBtn': 'Back',
-      'biometricLoginLabel': 'Sign in with biometrics',
-      'navDrawerProfile': 'My profile',
-      'navDrawerProfileSub': 'Personal data',
-      'navDrawerAchievements': 'Achievements',
-      'navDrawerAchievementsSub': 'View progress',
-      'navDrawerAppearance': 'Appearance',
-      'navDrawerAppearanceSub': 'Dark theme',
-      'navDrawerNotifications': 'Notifications',
-      'navDrawerNotificationsSub': 'Enabled',
-      'navDrawerCategories': 'Categories',
-      'navDrawerCategoriesSub': 'Personal, Academic, Health',
-      'navDrawerPrivacy': 'Privacy & data',
-      'navDrawerPrivacySub': 'Local storage',
-      'navDrawerHelp': 'Help & support',
-      'navDrawerHelpSub': 'Help center',
-      'navDrawerLogout': 'Log out',
-      'pageNotFound': 'Page not found',
-      'noPendingTasks': 'No pending tasks',
-      'errorTitle': 'Something went wrong',
-      'retryButton': 'Retry',
-      'validationNameEmpty': 'Name is required',
-      'validationEmailInvalid': 'Invalid email',
-      'validationPasswordShort': 'Password must be at least 6 characters',
-      'validationHabitTitle': 'Habit name is required',
-      'validationHabitGoal': 'Goal must be greater than 0',
-      'validationTaskTitle': 'Title is required',
-      'validationTaskDate': 'Date and time are required',
-      'emailInUse': 'An account with this email already exists',
-      'invalidCredentials': 'Incorrect email or password',
-      'sessionRestoreError': 'Error restoring session',
-      'monthJanuary': 'January',
-      'monthFebruary': 'February',
-      'monthMarch': 'March',
-      'monthApril': 'April',
-      'monthMay': 'May',
-      'monthJune': 'June',
-      'monthJuly': 'July',
-      'monthAugust': 'August',
-      'monthSeptember': 'September',
-      'monthOctober': 'October',
-      'monthNovember': 'November',
-      'monthDecember': 'December',
-    },
-  };
+  /// No description provided for @appName.
+  ///
+  /// In es, this message translates to:
+  /// **'DayFlow'**
+  String get appName;
 
-  String _resolve(String key) {
-    return _localizedValues[locale.languageCode]?[key] ?? _localizedValues['es']![key] ?? key;
-  }
+  /// No description provided for @loginTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Hola de nuevo!'**
+  String get loginTitle;
 
-  Future<AppLocalizations> load() async {
-    return AppLocalizations(locale);
-  }
+  /// No description provided for @loginSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Inicia sesión para continuar con tu progreso.'**
+  String get loginSubtitle;
 
-  // --- Simple getters ---
+  /// No description provided for @loginButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar sesión'**
+  String get loginButton;
 
-  String get appName => _resolve('appName');
-  String get loginTitle => _resolve('loginTitle');
-  String get loginSubtitle => _resolve('loginSubtitle');
-  String get loginButton => _resolve('loginButton');
-  String get registerButton => _resolve('registerButton');
-  String get forgotPassword => _resolve('forgotPassword');
-  String get biometricPrompt => _resolve('biometricPrompt');
-  String get noUserRegistered => _resolve('noUserRegistered');
-  String get emailLabel => _resolve('emailLabel');
-  String get emailHint => _resolve('emailHint');
-  String get passwordLabel => _resolve('passwordLabel');
-  String get passwordHint => _resolve('passwordHint');
-  String get emailRequired => _resolve('emailRequired');
-  String get emailInvalid => _resolve('emailInvalid');
-  String get passwordRequired => _resolve('passwordRequired');
-  String get passwordMinLength => _resolve('passwordMinLength');
-  String get passwordMinLengthDot => _resolve('passwordMinLengthDot');
-  String get nameLabel => _resolve('nameLabel');
-  String get nameRequired => _resolve('nameRequired');
-  String get nameHint => _resolve('nameHint');
-  String get registerTitle => _resolve('registerTitle');
-  String get registerSubtitle => _resolve('registerSubtitle');
-  String get alreadyHaveAccount => _resolve('alreadyHaveAccount');
-  String get alreadyHaveAccountLogin => _resolve('alreadyHaveAccountLogin');
-  String get loginLink => _resolve('loginLink');
-  String get termsAccepted => _resolve('termsAccepted');
-  String get termsRequired => _resolve('termsRequired');
-  String get logoutConfirm => _resolve('logoutConfirm');
-  String get logoutMessage => _resolve('logoutMessage');
-  String get cancelButton => _resolve('cancelButton');
-  String get confirmButton => _resolve('confirmButton');
-  String get deleteButton => _resolve('deleteButton');
-  String get saveButton => _resolve('saveButton');
-  String get homeTab => _resolve('homeTab');
-  String get tasksTab => _resolve('tasksTab');
-  String get habitsTab => _resolve('habitsTab');
-  String get statsTab => _resolve('statsTab');
-  String get moreTab => _resolve('moreTab');
-  String get helloTitle => _resolve('helloTitle');
-  String get upcomingActivities => _resolve('upcomingActivities');
-  String get noActivitiesToday => _resolve('noActivitiesToday');
-  String get goodJobDay => _resolve('goodJobDay');
-  String get totalActivities => _resolve('totalActivities');
-  String get addTaskTitle => _resolve('addTaskTitle');
-  String get editTaskTitle => _resolve('editTaskTitle');
-  String get taskTitleLabel => _resolve('taskTitleLabel');
-  String get taskTitleHint => _resolve('taskTitleHint');
-  String get taskDescLabel => _resolve('taskDescLabel');
-  String get taskDescHint => _resolve('taskDescHint');
-  String get taskCategoryLabel => _resolve('taskCategoryLabel');
-  String get taskDateLabel => _resolve('taskDateLabel');
-  String get taskTimeLabel => _resolve('taskTimeLabel');
-  String get taskReminderLabel => _resolve('taskReminderLabel');
-  String get saveTaskCreate => _resolve('saveTaskCreate');
-  String get saveTaskEdit => _resolve('saveTaskEdit');
-  String get taskTitleRequired => _resolve('taskTitleRequired');
-  String get addHabitTitle => _resolve('addHabitTitle');
-  String get editHabitTitle => _resolve('editHabitTitle');
-  String get habitNameLabel => _resolve('habitNameLabel');
-  String get habitNameHint => _resolve('habitNameHint');
-  String get habitGoalLabel => _resolve('habitGoalLabel');
-  String get habitUnitLabel => _resolve('habitUnitLabel');
-  String get habitFrequencyLabel => _resolve('habitFrequencyLabel');
-  String get habitIconLabel => _resolve('habitIconLabel');
-  String get saveHabitCreate => _resolve('saveHabitCreate');
-  String get saveHabitEdit => _resolve('saveHabitEdit');
-  String get habitNameRequired => _resolve('habitNameRequired');
-  String get streakLabel => _resolve('streakLabel');
-  String get globalStreakLabel => _resolve('globalStreakLabel');
-  String get dailyStreak => _resolve('dailyStreak');
-  String get daysInARow => _resolve('daysInARow');
-  String get completedLabel => _resolve('completedLabel');
-  String get completedExclamation => _resolve('completedExclamation');
-  String get pendingLabel => _resolve('pendingLabel');
-  String get noTasksTitle => _resolve('noTasksTitle');
-  String get noTasksSubtitle => _resolve('noTasksSubtitle');
-  String get noTasksAction => _resolve('noTasksAction');
-  String get filterAll => _resolve('filterAll');
-  String get today => _resolve('today');
-  String get tomorrow => _resolve('tomorrow');
-  String get later => _resolve('later');
-  String get taskCompleted => _resolve('taskCompleted');
-  String get taskMarkComplete => _resolve('taskMarkComplete');
-  String get noHabitsTitle => _resolve('noHabitsTitle');
-  String get noHabitsSubtitle => _resolve('noHabitsSubtitle');
-  String get noHabitsAction => _resolve('noHabitsAction');
-  String get todayHabits => _resolve('todayHabits');
-  String get allMyHabits => _resolve('allMyHabits');
-  String get deleteHabit => _resolve('deleteHabit');
-  String get labelPersonal => _resolve('labelPersonal');
-  String get labelAcademic => _resolve('labelAcademic');
-  String get labelHealth => _resolve('labelHealth');
-  String get frequencyDaily => _resolve('frequencyDaily');
-  String get frequencyWeekly => _resolve('frequencyWeekly');
-  String get frequencyCustom => _resolve('frequencyCustom');
-  String get reminder5min => _resolve('reminder5min');
-  String get reminder15min => _resolve('reminder15min');
-  String get reminder30min => _resolve('reminder30min');
-  String get reminder60min => _resolve('reminder60min');
-  String get timeOnce => _resolve('timeOnce');
-  String get timeTimes => _resolve('timeTimes');
-  String get dayMon => _resolve('dayMon');
-  String get dayTue => _resolve('dayTue');
-  String get dayWed => _resolve('dayWed');
-  String get dayThu => _resolve('dayThu');
-  String get dayFri => _resolve('dayFri');
-  String get daySat => _resolve('daySat');
-  String get daySun => _resolve('daySun');
-  String get statsTitle => _resolve('statsTitle');
-  String get completedPercent => _resolve('completedPercent');
-  String get weeklyStats => _resolve('weeklyStats');
-  String get noDataWeek => _resolve('noDataWeek');
-  String get statsTotal => _resolve('statsTotal');
-  String get statsWeek => _resolve('statsWeek');
-  String get achievementsTitle => _resolve('achievementsTitle');
-  String get achievementsUnlocked => _resolve('achievementsUnlocked');
-  String get achievementsUnlockedTab => _resolve('achievementsUnlockedTab');
-  String get achievementsLockedTab => _resolve('achievementsLockedTab');
-  String get noAchievementsTitle => _resolve('noAchievementsTitle');
-  String get noAchievementsSubtitle => _resolve('noAchievementsSubtitle');
-  String get moreTitle => _resolve('moreTitle');
-  String get personalizationSection => _resolve('personalizationSection');
-  String get appearanceTitle => _resolve('appearanceTitle');
-  String get themeLight => _resolve('themeLight');
-  String get themeDark => _resolve('themeDark');
-  String get themeSystem => _resolve('themeSystem');
-  String get themeSheetTitle => _resolve('themeSheetTitle');
-  String get dataSection => _resolve('dataSection');
-  String get backupTitle => _resolve('backupTitle');
-  String get backupSubtitle => _resolve('backupSubtitle');
-  String get exportDataTitle => _resolve('exportDataTitle');
-  String get exportDataSubtitle => _resolve('exportDataSubtitle');
-  String get progressSection => _resolve('progressSection');
-  String get calendarTitle => _resolve('calendarTitle');
-  String get calendarSubtitle => _resolve('calendarSubtitle');
-  String get accountSection => _resolve('accountSection');
-  String get logoutTitle => _resolve('logoutTitle');
-  String get logoutSubtitle => _resolve('logoutSubtitle');
-  String get profileTitle => _resolve('profileTitle');
-  String get recentMember => _resolve('recentMember');
-  String get currentStreak => _resolve('currentStreak');
-  String get achievementsCount => _resolve('achievementsCount');
-  String get settingsShortcut => _resolve('settingsShortcut');
-  String get privacyShortcut => _resolve('privacyShortcut');
-  String get helpShortcut => _resolve('helpShortcut');
-  String get backupLocalSection => _resolve('backupLocalSection');
-  String get backupExportAllSubtitle => _resolve('backupExportAllSubtitle');
-  String get backupReportSubtitle => _resolve('backupReportSubtitle');
-  String get backupFullSubtitle => _resolve('backupFullSubtitle');
-  String get backupDriveSection => _resolve('backupDriveSection');
-  String get backupConnectDrive => _resolve('backupConnectDrive');
-  String get backupSyncSubtitle => _resolve('backupSyncSubtitle');
-  String get backupUploadDrive => _resolve('backupUploadDrive');
-  String get backupUploadSubtitle => _resolve('backupUploadSubtitle');
-  String get backupDisconnectDrive => _resolve('backupDisconnectDrive');
-  String get backupSignOutDrive => _resolve('backupSignOutDrive');
-  String get noDriveBackups => _resolve('noDriveBackups');
-  String get driveBackups => _resolve('driveBackups');
-  String get backupSelectZip => _resolve('backupSelectZip');
-  String get backupDefaultName => _resolve('backupDefaultName');
-  String get exportCsv => _resolve('exportCsv');
-  String get exportPdf => _resolve('exportPdf');
-  String get createBackup => _resolve('createBackup');
-  String get restoreBackupLocal => _resolve('restoreBackupLocal');
-  String get taskDetailTitle => _resolve('taskDetailTitle');
-  String get taskDetailReminder => _resolve('taskDetailReminder');
-  String get taskDetailStatus => _resolve('taskDetailStatus');
-  String get taskDetailCompleted => _resolve('taskDetailCompleted');
-  String get taskDetailEdit => _resolve('taskDetailEdit');
-  String get taskDetailComplete => _resolve('taskDetailComplete');
-  String get taskDetailCompletedAction => _resolve('taskDetailCompletedAction');
-  String get splashTagline => _resolve('splashTagline');
-  String get splashOffline => _resolve('splashOffline');
-  String get splashPrivate => _resolve('splashPrivate');
-  String get splashReminders => _resolve('splashReminders');
-  String get splashGetStarted => _resolve('splashGetStarted');
-  String get splashHaveAccount => _resolve('splashHaveAccount');
-  String get splashTermsPrefix => _resolve('splashTermsPrefix');
-  String get splashTermsLink => _resolve('splashTermsLink');
-  String get splashTermsAnd => _resolve('splashTermsAnd');
-  String get splashPrivacyLink => _resolve('splashPrivacyLink');
-  String get forgotPasswordTitle => _resolve('forgotPasswordTitle');
-  String get forgotPasswordBody => _resolve('forgotPasswordBody');
-  String get forgotPasswordBack => _resolve('forgotPasswordBack');
-  String get forgotPasswordCreateAccount => _resolve('forgotPasswordCreateAccount');
-  String get backBtn => _resolve('backBtn');
-  String get biometricLoginLabel => _resolve('biometricLoginLabel');
-  String get navDrawerProfile => _resolve('navDrawerProfile');
-  String get navDrawerProfileSub => _resolve('navDrawerProfileSub');
-  String get navDrawerAchievements => _resolve('navDrawerAchievements');
-  String get navDrawerAchievementsSub => _resolve('navDrawerAchievementsSub');
-  String get navDrawerAppearance => _resolve('navDrawerAppearance');
-  String get navDrawerAppearanceSub => _resolve('navDrawerAppearanceSub');
-  String get navDrawerNotifications => _resolve('navDrawerNotifications');
-  String get navDrawerNotificationsSub => _resolve('navDrawerNotificationsSub');
-  String get navDrawerCategories => _resolve('navDrawerCategories');
-  String get navDrawerCategoriesSub => _resolve('navDrawerCategoriesSub');
-  String get navDrawerPrivacy => _resolve('navDrawerPrivacy');
-  String get navDrawerPrivacySub => _resolve('navDrawerPrivacySub');
-  String get navDrawerHelp => _resolve('navDrawerHelp');
-  String get navDrawerHelpSub => _resolve('navDrawerHelpSub');
-  String get navDrawerLogout => _resolve('navDrawerLogout');
-  String get pageNotFound => _resolve('pageNotFound');
-  String get noPendingTasks => _resolve('noPendingTasks');
-  String get errorTitle => _resolve('errorTitle');
-  String get retryButton => _resolve('retryButton');
-  String get validationNameEmpty => _resolve('validationNameEmpty');
-  String get validationEmailInvalid => _resolve('validationEmailInvalid');
-  String get validationPasswordShort => _resolve('validationPasswordShort');
-  String get validationHabitTitle => _resolve('validationHabitTitle');
-  String get validationHabitGoal => _resolve('validationHabitGoal');
-  String get validationTaskTitle => _resolve('validationTaskTitle');
-  String get validationTaskDate => _resolve('validationTaskDate');
-  String get emailInUse => _resolve('emailInUse');
-  String get invalidCredentials => _resolve('invalidCredentials');
-  String get sessionRestoreError => _resolve('sessionRestoreError');
-  String get monthJanuary => _resolve('monthJanuary');
-  String get monthFebruary => _resolve('monthFebruary');
-  String get monthMarch => _resolve('monthMarch');
-  String get monthApril => _resolve('monthApril');
-  String get monthMay => _resolve('monthMay');
-  String get monthJune => _resolve('monthJune');
-  String get monthJuly => _resolve('monthJuly');
-  String get monthAugust => _resolve('monthAugust');
-  String get monthSeptember => _resolve('monthSeptember');
-  String get monthOctober => _resolve('monthOctober');
-  String get monthNovember => _resolve('monthNovember');
-  String get monthDecember => _resolve('monthDecember');
+  /// No description provided for @registerButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Regístrate'**
+  String get registerButton;
 
-  // --- Parameterized methods ---
+  /// No description provided for @forgotPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Olvidaste tu contraseña?'**
+  String get forgotPassword;
 
-  String reminderBefore(String minutes) {
-    final template = _resolve('reminderBefore');
-    return template.replaceAll('{minutes}', minutes);
-  }
+  /// No description provided for @biometricPrompt.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar biometría'**
+  String get biometricPrompt;
 
-  String goalLabel(String value, String unit) {
-    final template = _resolve('goalLabel');
-    return template.replaceAll('{value}', value).replaceAll('{unit}', unit);
-  }
+  /// No description provided for @noUserRegistered.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay usuario registrado'**
+  String get noUserRegistered;
 
-  String deleteHabitConfirm(String name) {
-    final template = _resolve('deleteHabitConfirm');
-    return template.replaceAll('{name}', name);
-  }
+  /// No description provided for @emailLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Correo electrónico'**
+  String get emailLabel;
 
-  String memberSince(String date) {
-    final template = _resolve('memberSince');
-    return template.replaceAll('{date}', date);
-  }
+  /// No description provided for @emailHint.
+  ///
+  /// In es, this message translates to:
+  /// **'tu@email.com'**
+  String get emailHint;
 
-  String backupDownloadedTo(String path) {
-    final template = _resolve('backupDownloadedTo');
-    return template.replaceAll('{path}', path);
-  }
+  /// No description provided for @passwordLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Contraseña'**
+  String get passwordLabel;
 
-  String backupSavedTo(String path) {
-    final template = _resolve('backupSavedTo');
-    return template.replaceAll('{path}', path);
-  }
+  /// No description provided for @passwordHint.
+  ///
+  /// In es, this message translates to:
+  /// **'••••••••'**
+  String get passwordHint;
+
+  /// No description provided for @emailRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'El correo es obligatorio'**
+  String get emailRequired;
+
+  /// No description provided for @emailInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Correo inválido'**
+  String get emailInvalid;
+
+  /// No description provided for @passwordRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'La contraseña es obligatoria'**
+  String get passwordRequired;
+
+  /// No description provided for @passwordMinLength.
+  ///
+  /// In es, this message translates to:
+  /// **'Mínimo 6 caracteres'**
+  String get passwordMinLength;
+
+  /// No description provided for @passwordMinLengthDot.
+  ///
+  /// In es, this message translates to:
+  /// **'Mínimo 6 caracteres.'**
+  String get passwordMinLengthDot;
+
+  /// No description provided for @nameLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre completo'**
+  String get nameLabel;
+
+  /// No description provided for @nameRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'El nombre es obligatorio'**
+  String get nameRequired;
+
+  /// No description provided for @nameHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu nombre'**
+  String get nameHint;
+
+  /// No description provided for @registerTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear cuenta'**
+  String get registerTitle;
+
+  /// No description provided for @registerSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Comienza a organizar tu día en menos de un minuto.'**
+  String get registerSubtitle;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Aún no tienes cuenta? '**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @alreadyHaveAccountLogin.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Ya tienes cuenta? '**
+  String get alreadyHaveAccountLogin;
+
+  /// No description provided for @loginLink.
+  ///
+  /// In es, this message translates to:
+  /// **'Inicia sesión'**
+  String get loginLink;
+
+  /// No description provided for @termsAccepted.
+  ///
+  /// In es, this message translates to:
+  /// **'Acepto los términos de servicio y la política de privacidad.'**
+  String get termsAccepted;
+
+  /// No description provided for @termsRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Debes aceptar los términos'**
+  String get termsRequired;
+
+  /// No description provided for @logoutConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Cerrar sesión?'**
+  String get logoutConfirm;
+
+  /// No description provided for @logoutMessage.
+  ///
+  /// In es, this message translates to:
+  /// **'Perderás el acceso hasta que inicies sesión de nuevo.'**
+  String get logoutMessage;
+
+  /// No description provided for @cancelButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar'**
+  String get cancelButton;
+
+  /// No description provided for @confirmButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar'**
+  String get confirmButton;
+
+  /// No description provided for @deleteButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar'**
+  String get deleteButton;
+
+  /// No description provided for @saveButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar'**
+  String get saveButton;
+
+  /// No description provided for @homeTab.
+  ///
+  /// In es, this message translates to:
+  /// **'Inicio'**
+  String get homeTab;
+
+  /// No description provided for @tasksTab.
+  ///
+  /// In es, this message translates to:
+  /// **'Tareas'**
+  String get tasksTab;
+
+  /// No description provided for @habitsTab.
+  ///
+  /// In es, this message translates to:
+  /// **'Hábitos'**
+  String get habitsTab;
+
+  /// No description provided for @statsTab.
+  ///
+  /// In es, this message translates to:
+  /// **'Stats'**
+  String get statsTab;
+
+  /// No description provided for @moreTab.
+  ///
+  /// In es, this message translates to:
+  /// **'Más'**
+  String get moreTab;
+
+  /// No description provided for @helloTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Hola!'**
+  String get helloTitle;
+
+  /// No description provided for @upcomingActivities.
+  ///
+  /// In es, this message translates to:
+  /// **'Próximas actividades'**
+  String get upcomingActivities;
+
+  /// No description provided for @noActivitiesToday.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes actividades pendientes hoy'**
+  String get noActivitiesToday;
+
+  /// No description provided for @goodJobDay.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Buen trabajo! Disfruta tu día.'**
+  String get goodJobDay;
+
+  /// No description provided for @totalActivities.
+  ///
+  /// In es, this message translates to:
+  /// **'Actividades\ntotales'**
+  String get totalActivities;
+
+  /// No description provided for @addTaskTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva tarea'**
+  String get addTaskTitle;
+
+  /// No description provided for @editTaskTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar tarea'**
+  String get editTaskTitle;
+
+  /// No description provided for @taskTitleLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Título'**
+  String get taskTitleLabel;
+
+  /// No description provided for @taskTitleHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la actividad'**
+  String get taskTitleHint;
+
+  /// No description provided for @taskDescLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Descripción'**
+  String get taskDescLabel;
+
+  /// No description provided for @taskDescHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Descripción opcional…'**
+  String get taskDescHint;
+
+  /// No description provided for @taskCategoryLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Categoría'**
+  String get taskCategoryLabel;
+
+  /// No description provided for @taskDateLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha'**
+  String get taskDateLabel;
+
+  /// No description provided for @taskTimeLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Hora'**
+  String get taskTimeLabel;
+
+  /// No description provided for @taskReminderLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordatorio'**
+  String get taskReminderLabel;
+
+  /// No description provided for @reminderBefore.
+  ///
+  /// In es, this message translates to:
+  /// **'{minutes} antes'**
+  String reminderBefore(String minutes);
+
+  /// No description provided for @saveTaskCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar actividad'**
+  String get saveTaskCreate;
+
+  /// No description provided for @saveTaskEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar cambios'**
+  String get saveTaskEdit;
+
+  /// No description provided for @taskTitleRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'El título es obligatorio'**
+  String get taskTitleRequired;
+
+  /// No description provided for @addHabitTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo hábito'**
+  String get addHabitTitle;
+
+  /// No description provided for @editHabitTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar hábito'**
+  String get editHabitTitle;
+
+  /// No description provided for @habitNameLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre del hábito'**
+  String get habitNameLabel;
+
+  /// No description provided for @habitNameHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre del hábito…'**
+  String get habitNameHint;
+
+  /// No description provided for @habitGoalLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Meta diaria'**
+  String get habitGoalLabel;
+
+  /// No description provided for @habitUnitLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Unidad'**
+  String get habitUnitLabel;
+
+  /// No description provided for @habitFrequencyLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Frecuencia'**
+  String get habitFrequencyLabel;
+
+  /// No description provided for @habitIconLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Icono'**
+  String get habitIconLabel;
+
+  /// No description provided for @saveHabitCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear hábito'**
+  String get saveHabitCreate;
+
+  /// No description provided for @saveHabitEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar cambios'**
+  String get saveHabitEdit;
+
+  /// No description provided for @habitNameRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'El nombre es obligatorio'**
+  String get habitNameRequired;
+
+  /// No description provided for @streakLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Racha'**
+  String get streakLabel;
+
+  /// No description provided for @globalStreakLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Racha global'**
+  String get globalStreakLabel;
+
+  /// No description provided for @dailyStreak.
+  ///
+  /// In es, this message translates to:
+  /// **'RACHA DIARIA'**
+  String get dailyStreak;
+
+  /// No description provided for @daysInARow.
+  ///
+  /// In es, this message translates to:
+  /// **'días seguidos'**
+  String get daysInARow;
+
+  /// No description provided for @completedLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Completado'**
+  String get completedLabel;
+
+  /// No description provided for @completedExclamation.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Completado!'**
+  String get completedExclamation;
+
+  /// No description provided for @goalLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Meta: {value} {unit}'**
+  String goalLabel(String value, String unit);
+
+  /// No description provided for @pendingLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendiente'**
+  String get pendingLabel;
+
+  /// No description provided for @noTasksTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes tareas'**
+  String get noTasksTitle;
+
+  /// No description provided for @noTasksSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Agrega tu primera tarea para empezar'**
+  String get noTasksSubtitle;
+
+  /// No description provided for @noTasksAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Agregar tarea'**
+  String get noTasksAction;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Todas'**
+  String get filterAll;
+
+  /// No description provided for @today.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoy'**
+  String get today;
+
+  /// No description provided for @tomorrow.
+  ///
+  /// In es, this message translates to:
+  /// **'Mañana'**
+  String get tomorrow;
+
+  /// No description provided for @later.
+  ///
+  /// In es, this message translates to:
+  /// **'Más adelante'**
+  String get later;
+
+  /// No description provided for @taskCompleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Tarea completada'**
+  String get taskCompleted;
+
+  /// No description provided for @taskMarkComplete.
+  ///
+  /// In es, this message translates to:
+  /// **'Marcar tarea como completada'**
+  String get taskMarkComplete;
+
+  /// No description provided for @noHabitsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes hábitos para hoy'**
+  String get noHabitsTitle;
+
+  /// No description provided for @noHabitsSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Crea un hábito y empieza tu racha'**
+  String get noHabitsSubtitle;
+
+  /// No description provided for @noHabitsAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear hábito'**
+  String get noHabitsAction;
+
+  /// No description provided for @todayHabits.
+  ///
+  /// In es, this message translates to:
+  /// **'Hábitos de hoy'**
+  String get todayHabits;
+
+  /// No description provided for @allMyHabits.
+  ///
+  /// In es, this message translates to:
+  /// **'Todos mis hábitos'**
+  String get allMyHabits;
+
+  /// No description provided for @deleteHabit.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar hábito'**
+  String get deleteHabit;
+
+  /// No description provided for @deleteHabitConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar \"{name}\"? Esta acción no se puede deshacer.'**
+  String deleteHabitConfirm(String name);
+
+  /// No description provided for @labelPersonal.
+  ///
+  /// In es, this message translates to:
+  /// **'Personal'**
+  String get labelPersonal;
+
+  /// No description provided for @labelAcademic.
+  ///
+  /// In es, this message translates to:
+  /// **'Académica'**
+  String get labelAcademic;
+
+  /// No description provided for @labelHealth.
+  ///
+  /// In es, this message translates to:
+  /// **'Salud'**
+  String get labelHealth;
+
+  /// No description provided for @frequencyDaily.
+  ///
+  /// In es, this message translates to:
+  /// **'Diario'**
+  String get frequencyDaily;
+
+  /// No description provided for @frequencyWeekly.
+  ///
+  /// In es, this message translates to:
+  /// **'Semanal'**
+  String get frequencyWeekly;
+
+  /// No description provided for @frequencyCustom.
+  ///
+  /// In es, this message translates to:
+  /// **'Personalizado'**
+  String get frequencyCustom;
+
+  /// No description provided for @reminder5min.
+  ///
+  /// In es, this message translates to:
+  /// **'5 min'**
+  String get reminder5min;
+
+  /// No description provided for @reminder15min.
+  ///
+  /// In es, this message translates to:
+  /// **'15 min'**
+  String get reminder15min;
+
+  /// No description provided for @reminder30min.
+  ///
+  /// In es, this message translates to:
+  /// **'30 min'**
+  String get reminder30min;
+
+  /// No description provided for @reminder60min.
+  ///
+  /// In es, this message translates to:
+  /// **'60 min'**
+  String get reminder60min;
+
+  /// No description provided for @timeOnce.
+  ///
+  /// In es, this message translates to:
+  /// **'vez'**
+  String get timeOnce;
+
+  /// No description provided for @timeTimes.
+  ///
+  /// In es, this message translates to:
+  /// **'veces'**
+  String get timeTimes;
+
+  /// No description provided for @dayMon.
+  ///
+  /// In es, this message translates to:
+  /// **'L'**
+  String get dayMon;
+
+  /// No description provided for @dayTue.
+  ///
+  /// In es, this message translates to:
+  /// **'M'**
+  String get dayTue;
+
+  /// No description provided for @dayWed.
+  ///
+  /// In es, this message translates to:
+  /// **'X'**
+  String get dayWed;
+
+  /// No description provided for @dayThu.
+  ///
+  /// In es, this message translates to:
+  /// **'J'**
+  String get dayThu;
+
+  /// No description provided for @dayFri.
+  ///
+  /// In es, this message translates to:
+  /// **'V'**
+  String get dayFri;
+
+  /// No description provided for @daySat.
+  ///
+  /// In es, this message translates to:
+  /// **'S'**
+  String get daySat;
+
+  /// No description provided for @daySun.
+  ///
+  /// In es, this message translates to:
+  /// **'D'**
+  String get daySun;
+
+  /// No description provided for @statsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Estadísticas'**
+  String get statsTitle;
+
+  /// No description provided for @completedPercent.
+  ///
+  /// In es, this message translates to:
+  /// **'Completado'**
+  String get completedPercent;
+
+  /// No description provided for @weeklyStats.
+  ///
+  /// In es, this message translates to:
+  /// **'Cumplimiento semanal'**
+  String get weeklyStats;
+
+  /// No description provided for @noDataWeek.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin datos esta semana'**
+  String get noDataWeek;
+
+  /// No description provided for @statsTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Total'**
+  String get statsTotal;
+
+  /// No description provided for @statsWeek.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta semana'**
+  String get statsWeek;
+
+  /// No description provided for @achievementsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Logros'**
+  String get achievementsTitle;
+
+  /// No description provided for @achievementsUnlocked.
+  ///
+  /// In es, this message translates to:
+  /// **'desbloqueados'**
+  String get achievementsUnlocked;
+
+  /// No description provided for @achievementsUnlockedTab.
+  ///
+  /// In es, this message translates to:
+  /// **'Desbloqueados'**
+  String get achievementsUnlockedTab;
+
+  /// No description provided for @achievementsLockedTab.
+  ///
+  /// In es, this message translates to:
+  /// **'Bloqueados'**
+  String get achievementsLockedTab;
+
+  /// No description provided for @noAchievementsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin logros'**
+  String get noAchievementsTitle;
+
+  /// No description provided for @noAchievementsSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Completa tareas y hábitos para desbloquear logros'**
+  String get noAchievementsSubtitle;
+
+  /// No description provided for @moreTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Más'**
+  String get moreTitle;
+
+  /// No description provided for @personalizationSection.
+  ///
+  /// In es, this message translates to:
+  /// **'Personalización'**
+  String get personalizationSection;
+
+  /// No description provided for @appearanceTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Apariencia'**
+  String get appearanceTitle;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In es, this message translates to:
+  /// **'Claro'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In es, this message translates to:
+  /// **'Oscuro'**
+  String get themeDark;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In es, this message translates to:
+  /// **'Sistema'**
+  String get themeSystem;
+
+  /// No description provided for @themeSheetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tema'**
+  String get themeSheetTitle;
+
+  /// No description provided for @dataSection.
+  ///
+  /// In es, this message translates to:
+  /// **'Datos'**
+  String get dataSection;
+
+  /// No description provided for @backupTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia de seguridad'**
+  String get backupTitle;
+
+  /// No description provided for @backupSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar y restaurar'**
+  String get backupSubtitle;
+
+  /// No description provided for @exportDataTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar datos'**
+  String get exportDataTitle;
+
+  /// No description provided for @exportDataSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'CSV y PDF'**
+  String get exportDataSubtitle;
+
+  /// No description provided for @progressSection.
+  ///
+  /// In es, this message translates to:
+  /// **'Progreso'**
+  String get progressSection;
+
+  /// No description provided for @calendarTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Calendario'**
+  String get calendarTitle;
+
+  /// No description provided for @calendarSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Vista mensual y semanal'**
+  String get calendarSubtitle;
+
+  /// No description provided for @accountSection.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta'**
+  String get accountSection;
+
+  /// No description provided for @logoutTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar sesión'**
+  String get logoutTitle;
+
+  /// No description provided for @logoutSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Salir de la aplicación'**
+  String get logoutSubtitle;
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Perfil'**
+  String get profileTitle;
+
+  /// No description provided for @memberSince.
+  ///
+  /// In es, this message translates to:
+  /// **'Miembro desde {date}'**
+  String memberSince(String date);
+
+  /// No description provided for @recentMember.
+  ///
+  /// In es, this message translates to:
+  /// **'Miembro reciente'**
+  String get recentMember;
+
+  /// No description provided for @currentStreak.
+  ///
+  /// In es, this message translates to:
+  /// **'Racha actual'**
+  String get currentStreak;
+
+  /// No description provided for @achievementsCount.
+  ///
+  /// In es, this message translates to:
+  /// **'Logros'**
+  String get achievementsCount;
+
+  /// No description provided for @settingsShortcut.
+  ///
+  /// In es, this message translates to:
+  /// **'Configuración'**
+  String get settingsShortcut;
+
+  /// No description provided for @privacyShortcut.
+  ///
+  /// In es, this message translates to:
+  /// **'Privacidad'**
+  String get privacyShortcut;
+
+  /// No description provided for @helpShortcut.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayuda'**
+  String get helpShortcut;
+
+  /// No description provided for @backupLocalSection.
+  ///
+  /// In es, this message translates to:
+  /// **'LOCAL'**
+  String get backupLocalSection;
+
+  /// No description provided for @backupExportAllSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Exporta todas tus tareas y hábitos'**
+  String get backupExportAllSubtitle;
+
+  /// No description provided for @backupReportSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Genera un reporte visual'**
+  String get backupReportSubtitle;
+
+  /// No description provided for @backupFullSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia completa de la base de datos'**
+  String get backupFullSubtitle;
+
+  /// No description provided for @backupDriveSection.
+  ///
+  /// In es, this message translates to:
+  /// **'GOOGLE DRIVE'**
+  String get backupDriveSection;
+
+  /// No description provided for @backupConnectDrive.
+  ///
+  /// In es, this message translates to:
+  /// **'Conectar con Google Drive'**
+  String get backupConnectDrive;
+
+  /// No description provided for @backupSyncSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sincroniza tus backups en la nube'**
+  String get backupSyncSubtitle;
+
+  /// No description provided for @backupUploadDrive.
+  ///
+  /// In es, this message translates to:
+  /// **'Subir backup a Drive'**
+  String get backupUploadDrive;
+
+  /// No description provided for @backupUploadSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Crea backup local y súbelo'**
+  String get backupUploadSubtitle;
+
+  /// No description provided for @backupDisconnectDrive.
+  ///
+  /// In es, this message translates to:
+  /// **'Desconectar Google Drive'**
+  String get backupDisconnectDrive;
+
+  /// No description provided for @backupSignOutDrive.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar sesión de Google'**
+  String get backupSignOutDrive;
+
+  /// No description provided for @noDriveBackups.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay backups en Drive'**
+  String get noDriveBackups;
+
+  /// No description provided for @driveBackups.
+  ///
+  /// In es, this message translates to:
+  /// **'Backups en Drive'**
+  String get driveBackups;
+
+  /// No description provided for @backupSelectZip.
+  ///
+  /// In es, this message translates to:
+  /// **'Selecciona un archivo .zip'**
+  String get backupSelectZip;
+
+  /// No description provided for @backupDefaultName.
+  ///
+  /// In es, this message translates to:
+  /// **'Backup'**
+  String get backupDefaultName;
+
+  /// No description provided for @backupDownloadedTo.
+  ///
+  /// In es, this message translates to:
+  /// **'Descargado a: {path}'**
+  String backupDownloadedTo(String path);
+
+  /// No description provided for @exportCsv.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar a CSV'**
+  String get exportCsv;
+
+  /// No description provided for @exportPdf.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar a PDF'**
+  String get exportPdf;
+
+  /// No description provided for @createBackup.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear backup ZIP'**
+  String get createBackup;
+
+  /// No description provided for @restoreBackupLocal.
+  ///
+  /// In es, this message translates to:
+  /// **'Restaurar backup local'**
+  String get restoreBackupLocal;
+
+  /// No description provided for @backupSavedTo.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardado:\n{path}'**
+  String backupSavedTo(String path);
+
+  /// No description provided for @taskDetailTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Detalle'**
+  String get taskDetailTitle;
+
+  /// No description provided for @taskDetailReminder.
+  ///
+  /// In es, this message translates to:
+  /// **'minutos antes'**
+  String get taskDetailReminder;
+
+  /// No description provided for @taskDetailStatus.
+  ///
+  /// In es, this message translates to:
+  /// **'Estado'**
+  String get taskDetailStatus;
+
+  /// No description provided for @taskDetailCompleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Completada ✓'**
+  String get taskDetailCompleted;
+
+  /// No description provided for @taskDetailEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar'**
+  String get taskDetailEdit;
+
+  /// No description provided for @taskDetailComplete.
+  ///
+  /// In es, this message translates to:
+  /// **'Completar'**
+  String get taskDetailComplete;
+
+  /// No description provided for @taskDetailCompletedAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Completada'**
+  String get taskDetailCompletedAction;
+
+  /// No description provided for @splashTagline.
+  ///
+  /// In es, this message translates to:
+  /// **'Organiza tu día.\nConstruye mejores hábitos.'**
+  String get splashTagline;
+
+  /// No description provided for @splashOffline.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin conexión'**
+  String get splashOffline;
+
+  /// No description provided for @splashPrivate.
+  ///
+  /// In es, this message translates to:
+  /// **'100% privado'**
+  String get splashPrivate;
+
+  /// No description provided for @splashReminders.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordatorios'**
+  String get splashReminders;
+
+  /// No description provided for @splashGetStarted.
+  ///
+  /// In es, this message translates to:
+  /// **'Comenzar'**
+  String get splashGetStarted;
+
+  /// No description provided for @splashHaveAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya tengo una cuenta'**
+  String get splashHaveAccount;
+
+  /// No description provided for @splashTermsPrefix.
+  ///
+  /// In es, this message translates to:
+  /// **'Al continuar aceptas los '**
+  String get splashTermsPrefix;
+
+  /// No description provided for @splashTermsLink.
+  ///
+  /// In es, this message translates to:
+  /// **'Términos'**
+  String get splashTermsLink;
+
+  /// No description provided for @splashTermsAnd.
+  ///
+  /// In es, this message translates to:
+  /// **' y la '**
+  String get splashTermsAnd;
+
+  /// No description provided for @splashPrivacyLink.
+  ///
+  /// In es, this message translates to:
+  /// **'Política de privacidad'**
+  String get splashPrivacyLink;
+
+  /// No description provided for @forgotPasswordTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Recupera tu acceso'**
+  String get forgotPasswordTitle;
+
+  /// No description provided for @forgotPasswordBody.
+  ///
+  /// In es, this message translates to:
+  /// **'DayFlow funciona de forma offline. Si olvidaste tu contraseña, no podemos enviar un correo de recuperación. Te recomendamos crear una nueva cuenta.'**
+  String get forgotPasswordBody;
+
+  /// No description provided for @forgotPasswordBack.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a iniciar sesión'**
+  String get forgotPasswordBack;
+
+  /// No description provided for @forgotPasswordCreateAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear nueva cuenta'**
+  String get forgotPasswordCreateAccount;
+
+  /// No description provided for @backBtn.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver'**
+  String get backBtn;
+
+  /// No description provided for @biometricLoginLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar sesión con biometría'**
+  String get biometricLoginLabel;
+
+  /// No description provided for @navDrawerProfile.
+  ///
+  /// In es, this message translates to:
+  /// **'Mi perfil'**
+  String get navDrawerProfile;
+
+  /// No description provided for @navDrawerProfileSub.
+  ///
+  /// In es, this message translates to:
+  /// **'Datos personales'**
+  String get navDrawerProfileSub;
+
+  /// No description provided for @navDrawerAchievements.
+  ///
+  /// In es, this message translates to:
+  /// **'Logros'**
+  String get navDrawerAchievements;
+
+  /// No description provided for @navDrawerAchievementsSub.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver progreso'**
+  String get navDrawerAchievementsSub;
+
+  /// No description provided for @navDrawerAppearance.
+  ///
+  /// In es, this message translates to:
+  /// **'Apariencia'**
+  String get navDrawerAppearance;
+
+  /// No description provided for @navDrawerAppearanceSub.
+  ///
+  /// In es, this message translates to:
+  /// **'Tema oscuro'**
+  String get navDrawerAppearanceSub;
+
+  /// No description provided for @navDrawerNotifications.
+  ///
+  /// In es, this message translates to:
+  /// **'Notificaciones'**
+  String get navDrawerNotifications;
+
+  /// No description provided for @navDrawerNotificationsSub.
+  ///
+  /// In es, this message translates to:
+  /// **'Activadas'**
+  String get navDrawerNotificationsSub;
+
+  /// No description provided for @navDrawerCategories.
+  ///
+  /// In es, this message translates to:
+  /// **'Categorías'**
+  String get navDrawerCategories;
+
+  /// No description provided for @navDrawerCategoriesSub.
+  ///
+  /// In es, this message translates to:
+  /// **'Personal, Académica, Salud'**
+  String get navDrawerCategoriesSub;
+
+  /// No description provided for @navDrawerPrivacy.
+  ///
+  /// In es, this message translates to:
+  /// **'Privacidad y datos'**
+  String get navDrawerPrivacy;
+
+  /// No description provided for @navDrawerPrivacySub.
+  ///
+  /// In es, this message translates to:
+  /// **'Almacenamiento local'**
+  String get navDrawerPrivacySub;
+
+  /// No description provided for @navDrawerHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayuda y soporte'**
+  String get navDrawerHelp;
+
+  /// No description provided for @navDrawerHelpSub.
+  ///
+  /// In es, this message translates to:
+  /// **'Centro de ayuda'**
+  String get navDrawerHelpSub;
+
+  /// No description provided for @navDrawerLogout.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar sesión'**
+  String get navDrawerLogout;
+
+  /// No description provided for @pageNotFound.
+  ///
+  /// In es, this message translates to:
+  /// **'Pantalla no encontrada'**
+  String get pageNotFound;
+
+  /// No description provided for @noPendingTasks.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin tareas pendientes'**
+  String get noPendingTasks;
+
+  /// No description provided for @errorTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Algo salió mal'**
+  String get errorTitle;
+
+  /// No description provided for @retryButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Reintentar'**
+  String get retryButton;
+
+  /// No description provided for @validationNameEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'El nombre es obligatorio'**
+  String get validationNameEmpty;
+
+  /// No description provided for @validationEmailInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Correo electrónico inválido'**
+  String get validationEmailInvalid;
+
+  /// No description provided for @validationPasswordShort.
+  ///
+  /// In es, this message translates to:
+  /// **'La contraseña debe tener al menos 6 caracteres'**
+  String get validationPasswordShort;
+
+  /// No description provided for @validationHabitTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'El nombre del hábito es obligatorio'**
+  String get validationHabitTitle;
+
+  /// No description provided for @validationHabitGoal.
+  ///
+  /// In es, this message translates to:
+  /// **'La meta debe ser mayor a 0'**
+  String get validationHabitGoal;
+
+  /// No description provided for @validationTaskTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'El título es obligatorio'**
+  String get validationTaskTitle;
+
+  /// No description provided for @validationTaskDate.
+  ///
+  /// In es, this message translates to:
+  /// **'La fecha y hora son obligatorias'**
+  String get validationTaskDate;
+
+  /// No description provided for @emailInUse.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya existe una cuenta con este correo'**
+  String get emailInUse;
+
+  /// No description provided for @invalidCredentials.
+  ///
+  /// In es, this message translates to:
+  /// **'Correo o contraseña incorrectos'**
+  String get invalidCredentials;
+
+  /// No description provided for @sessionRestoreError.
+  ///
+  /// In es, this message translates to:
+  /// **'Error al restaurar sesión'**
+  String get sessionRestoreError;
+
+  /// No description provided for @monthJanuary.
+  ///
+  /// In es, this message translates to:
+  /// **'enero'**
+  String get monthJanuary;
+
+  /// No description provided for @monthFebruary.
+  ///
+  /// In es, this message translates to:
+  /// **'febrero'**
+  String get monthFebruary;
+
+  /// No description provided for @monthMarch.
+  ///
+  /// In es, this message translates to:
+  /// **'marzo'**
+  String get monthMarch;
+
+  /// No description provided for @monthApril.
+  ///
+  /// In es, this message translates to:
+  /// **'abril'**
+  String get monthApril;
+
+  /// No description provided for @monthMay.
+  ///
+  /// In es, this message translates to:
+  /// **'mayo'**
+  String get monthMay;
+
+  /// No description provided for @monthJune.
+  ///
+  /// In es, this message translates to:
+  /// **'junio'**
+  String get monthJune;
+
+  /// No description provided for @monthJuly.
+  ///
+  /// In es, this message translates to:
+  /// **'julio'**
+  String get monthJuly;
+
+  /// No description provided for @monthAugust.
+  ///
+  /// In es, this message translates to:
+  /// **'agosto'**
+  String get monthAugust;
+
+  /// No description provided for @monthSeptember.
+  ///
+  /// In es, this message translates to:
+  /// **'septiembre'**
+  String get monthSeptember;
+
+  /// No description provided for @monthOctober.
+  ///
+  /// In es, this message translates to:
+  /// **'octubre'**
+  String get monthOctober;
+
+  /// No description provided for @monthNovember.
+  ///
+  /// In es, this message translates to:
+  /// **'noviembre'**
+  String get monthNovember;
+
+  /// No description provided for @monthDecember.
+  ///
+  /// In es, this message translates to:
+  /// **'diciembre'**
+  String get monthDecember;
 }
 
-class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
-  const AppLocalizationsDelegate();
-
-  @override
-  bool isSupported(Locale locale) {
-    return ['es', 'en'].contains(locale.languageCode);
-  }
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
 
   @override
   Future<AppLocalizations> load(Locale locale) {
-    return AppLocalizations(locale).load();
+    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
   }
 
   @override
-  bool shouldReload(AppLocalizationsDelegate old) => false;
+  bool isSupported(Locale locale) =>
+      <String>['en', 'es'].contains(locale.languageCode);
+
+  @override
+  bool shouldReload(_AppLocalizationsDelegate old) => false;
+}
+
+AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when only language code is specified.
+  switch (locale.languageCode) {
+    case 'en':
+      return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+  }
+
+  throw FlutterError(
+      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+      'an issue with the localizations generation tool. Please file an issue '
+      'on GitHub with a reproducible sample app and the gen-l10n configuration '
+      'that was used.');
 }

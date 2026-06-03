@@ -10,7 +10,6 @@ import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/validators/validators.dart';
 import '../datasources/local_database.dart';
-import '../helpers/repository_helper.dart';
 import '../models/user_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {

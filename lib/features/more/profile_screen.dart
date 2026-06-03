@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
-import '../../domain/entities/achievement.dart';
 import '../../domain/entities/weekly_stats.dart';
 import '../../l10n/app_localizations.dart';
 import '../../presentation/providers/achievements_provider.dart';

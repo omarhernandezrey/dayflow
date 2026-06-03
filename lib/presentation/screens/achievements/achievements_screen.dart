@@ -51,7 +51,7 @@ class AchievementsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppDimensions.s2),
                 Text(
-                  l10n.achievementsUnlocked(unlocked.length, achievements.length),
+                  '${unlocked.length} ${l10n.achievementsUnlocked}',
                   style: AppTypography.inter(
                     fontSize: 14,
                     color: AppColors.textDim,

@@ -205,7 +205,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     final bioAsync = ref.watch(biometricsAvailableProvider);
                     return bioAsync.when(
                       loading: () => const SizedBox.shrink(),
-                      error: (_, _) => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
                       data: (available) {
                         if (!available) return const SizedBox.shrink();
                         return Column(

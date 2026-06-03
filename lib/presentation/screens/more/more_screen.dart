@@ -70,7 +70,7 @@ class MoreScreen extends ConsumerWidget {
               _MenuItem(
                 icon: Icons.emoji_events_outlined,
                 title: l10n.achievementsTitle,
-                subtitle: l10n.achievementsUnlocked(unlockedCount),
+                subtitle: '$unlockedCount ${l10n.achievementsUnlocked}',
                 trailing: unlockedCount > 0
                     ? Container(
                         padding: const EdgeInsets.symmetric(
