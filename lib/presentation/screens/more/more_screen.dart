@@ -14,9 +14,11 @@ class MoreScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final unlockedCount = ref.watch(unlockedAchievementsCountProvider).valueOrNull ?? 0;
+    final unlockedCount = ref.watch(unlockedAchievementsCountProvider.select((v) => v.valueOrNull ?? 0));
     final themeMode = ref.watch(themeModeProvider);
-    final user = ref.watch(authStateProvider).valueOrNull;
+    final userName = ref.watch(authStateProvider.select((v) => v.valueOrNull?.name ?? 'Usuario'));
+    final userEmail = ref.watch(authStateProvider.select((v) => v.valueOrNull?.email ?? 'DayFlow User'));
+    final userInitials = ref.watch(authStateProvider.select((v) => v.valueOrNull?.initials ?? 'U'));
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -38,7 +40,7 @@ class MoreScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppDimensions.s5),
-            _ProfileHeader(user: user),
+            _ProfileHeader(initials: userInitials, name: userName, email: userEmail),
             const SizedBox(height: AppDimensions.s5),
             _MenuSection(title: 'Personalización', items: [
               _MenuItem(
@@ -176,15 +178,13 @@ class MoreScreen extends ConsumerWidget {
 }
 
 class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({this.user});
-  final dynamic user;
+  const _ProfileHeader({required this.initials, required this.name, required this.email});
+  final String initials;
+  final String name;
+  final String email;
 
   @override
   Widget build(BuildContext context) {
-    final initials = user?.initials ?? 'U';
-    final name = user?.name ?? 'Usuario';
-    final email = user?.email ?? 'DayFlow User';
-
     return Container(
       padding: const EdgeInsets.all(AppDimensions.s4 + 2),
       decoration: BoxDecoration(

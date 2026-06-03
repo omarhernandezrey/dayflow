@@ -131,12 +131,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                     );
                   }
 
-                  final today = DateTime.now();
-                  final todayStr =
-                      '${today.year.toString().padLeft(4, '0')}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
-                  final tomorrow = today.add(const Duration(days: 1));
-                  final tomorrowStr =
-                      '${tomorrow.year.toString().padLeft(4, '0')}-${tomorrow.month.toString().padLeft(2, '0')}-${tomorrow.day.toString().padLeft(2, '0')}';
+                  final todayStr = DFDateUtils.isoDate(DateTime.now());
+                  final tomorrowStr = DFDateUtils.isoDate(DateTime.now().add(const Duration(days: 1)));
 
                   final todayTasks = tasks.where((t) => t.date == todayStr).toList();
                   final tomorrowTasks = tasks.where((t) => t.date == tomorrowStr).toList();

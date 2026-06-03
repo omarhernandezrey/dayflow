@@ -6,7 +6,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/task_category_ext.dart';
-import '../../../core/utils/df_date_utils.dart';
 import '../../../domain/entities/daily_summary.dart';
 import '../../../domain/entities/task.dart';
 import '../../providers/stats_provider.dart';
@@ -19,7 +18,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final todayStats = ref.watch(todayStatsProvider);
-    final allTasksAsync = ref.watch(tasksProvider);
+    final upcomingAsync = ref.watch(todayUpcomingTasksProvider);
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -67,20 +66,14 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            allTasksAsync.when(
+            upcomingAsync.when(
               loading: () => const SliverFillRemaining(
                 child: Center(child: CircularProgressIndicator()),
               ),
               error: (e, _) => SliverFillRemaining(
                 child: Center(child: Text('Error: $e')),
               ),
-              data: (tasks) {
-                final today = DFDateUtils.today();
-                final upcoming = tasks
-                    .where((t) => t.date == today && !t.completed)
-                    .toList()
-                  ..sort((a, b) => a.time.compareTo(b.time));
-
+              data: (upcoming) {
                 if (upcoming.isEmpty) {
                   return const SliverToBoxAdapter(
                     child: DFEmpty(
@@ -99,8 +92,7 @@ class HomeScreen extends ConsumerWidget {
                     itemCount: upcoming.length,
                     separatorBuilder: (context, index) => const SizedBox(height: 8),
                     itemBuilder: (_, i) {
-                      final t = upcoming[i];
-                      return _UpcomingTaskCard(task: t);
+                      return _UpcomingTaskCard(task: upcoming[i]);
                     },
                   ),
                 );

@@ -140,10 +140,9 @@ class _DFDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authStateProvider).valueOrNull;
-    final initials = user?.initials ?? 'U';
-    final name = user?.name ?? 'Usuario';
-    final email = user?.email ?? '';
+    final initials = ref.watch(authStateProvider.select((v) => v.valueOrNull?.initials ?? 'U'));
+    final name = ref.watch(authStateProvider.select((v) => v.valueOrNull?.name ?? 'Usuario'));
+    final email = ref.watch(authStateProvider.select((v) => v.valueOrNull?.email ?? ''));
 
     return Drawer(
       backgroundColor: AppColors.bg,

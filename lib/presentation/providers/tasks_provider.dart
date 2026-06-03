@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/utils/df_date_utils.dart';
 import '../../domain/entities/task.dart';
 import 'dependency_providers.dart';
 
@@ -93,6 +94,21 @@ final searchedTasksProvider = Provider<AsyncValue<List<TaskEntity>>>((ref) {
         return t.title.toLowerCase().contains(lower) ||
             t.description.toLowerCase().contains(lower);
       }).toList());
+    },
+  );
+});
+
+// Derived: today's upcoming (uncompleted) tasks, sorted by time
+final todayUpcomingTasksProvider = Provider<AsyncValue<List<TaskEntity>>>((ref) {
+  final tasksAsync = ref.watch(tasksProvider);
+  return tasksAsync.when(
+    loading: () => const AsyncValue.loading(),
+    error: (e, st) => AsyncValue.error(e, st),
+    data: (tasks) {
+      final today = DFDateUtils.isoDate(DateTime.now());
+      final upcoming = tasks.where((t) => t.date == today && !t.completed).toList()
+        ..sort((a, b) => a.time.compareTo(b.time));
+      return AsyncValue.data(upcoming);
     },
   );
 });

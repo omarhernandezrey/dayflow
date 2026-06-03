@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/services/home_widget_service.dart';
+import '../../core/utils/df_date_utils.dart';
 import '../providers/habits_provider.dart';
 import '../providers/tasks_provider.dart';
 
@@ -10,8 +11,7 @@ final homeWidgetUpdaterProvider = Provider<void>((ref) {
   final progressAsync = ref.watch(todayProgressProvider);
 
   tasksAsync.whenData((tasks) {
-    final today = DateTime.now();
-    final todayStr = '${today.year.toString().padLeft(4, '0')}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final todayStr = DFDateUtils.isoDate(DateTime.now());
 
     final pendingToday = tasks.where((t) => t.date == todayStr && !t.completed).toList()
       ..sort((a, b) => a.time.compareTo(b.time));
