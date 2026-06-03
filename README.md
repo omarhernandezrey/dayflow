@@ -5,7 +5,7 @@
 **Gestor personal de actividades, hábitos y estadísticas — 100 % offline-first**
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.44+-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-3.12+-0175C2?logo=dart&logoColor=white)](https://dart.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.4+-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Android](https://img.shields.io/badge/Android-API%2021+-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
 [![iOS](https://img.shields.io/badge/iOS-12.0+-000000?logo=apple&logoColor=white)](https://developer.apple.com)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -27,6 +27,7 @@
 - [Base de datos](#base-de-datos)
 - [Gestión de estado](#gestión-de-estado)
 - [Navegación](#navegación)
+- [Internacionalización (i18n)](#internacionalización-i18n)
 - [Sistema de diseño](#sistema-de-diseño)
 - [Instalación y ejecución](#instalación-y-ejecución)
 - [Compilar para distribución](#compilar-para-distribución)
@@ -74,13 +75,14 @@ Todos los datos se almacenan en SQLite local — **ningún dato sale del disposi
 | RF-08 | Estadísticas mensuales | Tasa de completitud diaria, mejor racha y racha actual del mes |
 | RF-09 | Filtrado y búsqueda | Filtrar tareas por categoría y búsqueda global de tareas y hábitos |
 | RF-10 | Logros | Sistema de achievements desbloqueables por hitos de productividad |
-| RF-11 | Autenticación | Registro e inicio de sesión local con hash SHA-256, sesión persistente |
-| RF-12 | Biometría | Inicio de sesión con huella dactilar o Face ID |
+| RF-11 | Autenticación | Registro e inicio de sesión local con hash SHA-256+salt, sesión persistente |
+| RF-12 | Biometría | Inicio de sesión con huella dactilar o Face ID (restaura sesión sin exponer contraseña) |
 | RF-13 | Exportación | Exportar datos a CSV y PDF; crear/restaurar backup en ZIP |
 | RF-14 | Google Drive | Sincronización opcional del backup cifrado con Google Drive personal |
 | RF-15 | Temas | Tema oscuro y claro conmutables, con soporte a preferencia del sistema |
 | RF-16 | Widget de pantalla principal | Home screen widget de Android con resumen del día |
 | RF-17 | Calendario | Vista de actividades en calendario mensual |
+| RF-18 | Internacionalización | Soporte completo EN/ES con 145+ claves traducidas |
 
 ### No funcionales
 
@@ -90,9 +92,11 @@ Todos los datos se almacenan en SQLite local — **ningún dato sale del disposi
 | RNF-02 | Compatibilidad | Android API 21+ · iOS 12+ · Windows · Linux · macOS |
 | RNF-03 | 100 % offline | SQLite local — sin backend, sin Firebase, sin telemetría |
 | RNF-04 | Privacidad | Datos exclusivamente en el dispositivo; exportación siempre bajo control del usuario |
-| RNF-05 | Seguridad | Contraseñas con hash SHA-256; no se almacenan en texto plano |
+| RNF-05 | Seguridad | Contraseñas con hash SHA-256 + salt aleatorio; migración automática de hashes legacy |
 | RNF-06 | Arquitectura limpia | Clean Architecture: domain / data / presentation completamente desacopladas |
-| RNF-07 | Cero advertencias | `flutter analyze` → `No issues found` |
+| RNF-07 | Fuentes bundled | Inter y JetBrains Mono como assets — sin dependencia de red para tipografía |
+| RNF-08 | Accesibilidad | Semantics labels en widgets interactivos; InkWell con feedback táctil |
+| RNF-09 | Validación de dominio | Validators centralizados en capa de dominio (email, contraseña, nombre) |
 
 ---
 
@@ -103,27 +107,29 @@ DayFlow implementa **Clean Architecture** con separación estricta en tres capas
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │                    PRESENTATION LAYER                            │
-│   Screens (ConsumerWidget)  ·  Providers (Riverpod AsyncNotifier)│
-│   Widgets reutilizables  ·  Tema y navegación                    │
+│   Screens (ConsumerWidget)  ·  Providers (Riverpod Notifier)     │
+│   Widgets reutilizables  ·  Tema y navegación  ·  L10n          │
 ├──────────────────────────────────────────────────────────────────┤
 │                      DOMAIN LAYER                                │
-│   Entities (clases puras Dart)                                   │
+│   Entities (clases puras Dart, sin Flutter)                      │
 │   Repository interfaces (contratos abstractos)                   │
-│   Use Cases (lógica de negocio atómica)                          │
+│   Use Cases (lógica de negocio atómica)                           │
+│   Validators (validación de email, contraseña, nombre)           │
 ├──────────────────────────────────────────────────────────────────┤
 │                       DATA LAYER                                 │
 │   Repository implementations                                     │
 │   Data sources (LocalDatabase, FileDatasource, BiometricDs…)    │
 │   Models (toMap / fromMap ↔ SQLite)                              │
+│   Helpers (executeOrFailure — boilerplate reduction)              │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
 **Principios clave:**
 
-- Las pantallas **solo leen** estado mediante `ref.watch()` — nunca acceden directamente a datos.
+- Las pantallas **solo leen** estado mediante `ref.watch()` con selectores cuando es posible — nunca acceden directamente a datos.
 - Los `AsyncNotifier` encapsulan toda la lógica de mutación y orquestan repositorios.
 - El dominio **no depende de Flutter** — solo de Dart puro y `dartz` para `Either<Failure, T>`.
-- Los repositorios convierten excepciones de infraestructura en `Failure` tipados.
+- Los repositorios convierten excepciones de infraestructura en `Failure` tipados vía `executeOrFailure()`.
 - Todos los `CREATE TABLE` usan `IF NOT EXISTS` — el esquema es idempotente.
 
 ---
@@ -132,20 +138,21 @@ DayFlow implementa **Clean Architecture** con separación estricta en tres capas
 
 ### Core
 
-| Paquete | Versión | Uso |
+| Paquete | Version | Uso |
 |---|---|---|
 | `flutter` | 3.44+ | Framework principal |
-| `dart` | 3.12+ | Null-safety, enums, records |
+| `dart` | 3.4+ | Null-safety, enums, records |
 | `flutter_riverpod` | ^2.5 | Gestión de estado (`AsyncNotifier`, `FutureProvider`) |
-| `go_router` | ^14.6 | Navegación declarativa con `StatefulShellRoute` |
-| `dartz` | ^0.10 | Programación funcional — `Either<Failure, T>` |
-| `equatable` | ^2.0 | Comparación por valor en entidades |
+| `go_router` | ^14.6 | Navigation declarativa con `StatefulShellRoute` |
+| `dartz` | ^0.10 | Programmation fonctionnelle — `Either<Failure, T>` |
+| `equatable` | ^2.0 | Comparaison par valeur en entités |
+| `flutter_localizations` | SDK | Generation de l10n (145+ claves EN/ES) |
 
 ### Persistencia
 
-| Paquete | Versión | Uso |
+| Paquete | Version | Uso |
 |---|---|---|
-| `sqflite` | ^2.3 | SQLite local — 6 tablas relacionales |
+| `sqflite` | ^2.3 | SQLite local — 6 tablas relationales |
 | `sqflite_common_ffi` | ^2.3 | Soporte SQLite en Windows / Linux / macOS |
 | `shared_preferences` | ^2.3 | Preferencias simples del usuario |
 | `path` | ^1.9 | Resolución de rutas del sistema de archivos |
@@ -153,16 +160,16 @@ DayFlow implementa **Clean Architecture** con separación estricta en tres capas
 
 ### Autenticación y seguridad
 
-| Paquete | Versión | Uso |
+| Paquete | Version | Uso |
 |---|---|---|
-| `crypto` | ^3.0 | Hash SHA-256 de contraseñas |
+| `crypto` | ^3.0 | Hash SHA-256 + salt de contraseñas |
 | `local_auth` | ^2.3 | Biometría (huella / Face ID) |
-| `local_auth_android` | ^1.0 | API específica de Android para mensajes personalizados |
+| `local_auth_android` | ^1.0 | API específica de Android |
 | `local_auth_darwin` | ^1.6 | API específica de iOS/macOS |
 
 ### Exportación y backup
 
-| Paquete | Versión | Uso |
+| Paquete | Version | Uso |
 |---|---|---|
 | `csv` | ^6.0 | Generación de archivos CSV |
 | `pdf` | ^3.10 | Generación de reportes PDF |
@@ -173,23 +180,31 @@ DayFlow implementa **Clean Architecture** con separación estricta en tres capas
 
 ### UI y animaciones
 
-| Paquete | Versión | Uso |
+| Paquete | Version | Uso |
 |---|---|---|
-| `google_fonts` | ^6.2 | Inter (UI) + JetBrains Mono (numérico) |
 | `fl_chart` | ^0.70 | `PieChart` (donut) + `BarChart` semanal |
 | `flutter_animate` | ^4.5 | Animaciones declarativas de entrada/salida |
 | `confetti` | ^0.8 | Lluvia de confeti al completar hábitos |
 | `shimmer` | ^3.0 | Skeleton loader en listas |
 | `table_calendar` | ^3.0 | Vista de calendario mensual |
 
+**Tipografía bundled:** Inter (Regular + Italic) y JetBrains Mono (Regular + Bold) como assets — sin dependencia de `google_fonts` ni red.
+
 ### Otras
 
-| Paquete | Versión | Uso |
+| Paquete | Version | Uso |
 |---|---|---|
 | `flutter_local_notifications` | ^17.2 | Notificaciones locales programadas |
 | `timezone` | ^0.9 | `zonedSchedule` exacto para notificaciones |
 | `home_widget` | ^0.7 | Widget en pantalla de inicio (Android/iOS) |
-| `intl` | ^0.20 | Fechas y horas en español |
+| `intl` | ^0.20 | Fechas y horas localizadas |
+
+### Testing
+
+| Paquete | Version | Uso |
+|---|---|---|
+| `flutter_test` | SDK | Tests unitarios y de widgets |
+| `mocktail` | ^1.0.4 | Mocks para tests de use cases y repositorios |
 
 ---
 
@@ -199,90 +214,110 @@ DayFlow implementa **Clean Architecture** con separación estricta en tres capas
 dayflow/
 ├── android/                          # Configuración Android (Gradle, Manifests)
 ├── ios/                              # Configuración iOS (Xcode, Info.plist)
+├── assets/
+│   └── fonts/                        # Inter + JetBrains Mono (bundled offline)
 ├── lib/
 │   ├── main.dart                     # Punto de entrada — FFI init, locale, notificaciones
-│   ├── app.dart                      # MaterialApp.router con tema y rutas
+│   ├── app.dart                      # MaterialApp.router con tema, l10n y rutas
 │   │
 │   ├── core/                         # Infraestructura transversal
 │   │   ├── constants/                # Constantes globales de la app
 │   │   ├── errors/
-│   │   │   ├── exceptions.dart       # AppException y subclases (DatabaseException…)
-│   │   │   └── failures.dart         # Failures tipados (DatabaseFailure, ValidationFailure…)
+│   │   │   ├── exceptions.dart       # AppException y subclases
+│   │   │   └── failures.dart         # Failures tipados
 │   │   ├── routes/
-│   │   │   └── app_router.dart       # GoRouter — todas las rutas de la app
+│   │   │   └── app_router.dart       # GoRouter — todas las rutas
 │   │   ├── services/
 │   │   │   └── home_widget_service.dart
 │   │   ├── theme/
 │   │   │   ├── app_colors.dart       # Tokens de color (dark palette)
 │   │   │   ├── app_dimensions.dart   # Grilla 4pt — spacing, radii, heights
-│   │   │   ├── app_shadows.dart      # Sombras y glows direccionales
-│   │   │   ├── app_typography.dart   # Escala tipográfica + Material 3 TextTheme
 │   │   │   ├── app_light_theme.dart  # ThemeData claro
-│   │   │   └── app_theme.dart        # ThemeData oscuro
+│   │   │   ├── app_shadows.dart      # Sombras y glows direccionales
+│   │   │   ├── app_theme.dart        # ThemeData oscuro
+│   │   │   ├── app_typography.dart   # Escala tipográfica + Material 3 TextTheme
+│   │   │   └── task_category_ext.dart # Mapeo de colores por categoría (extensión)
 │   │   ├── utils/
-│   │   │   └── df_date_utils.dart    # isoDate · displayDate · formatTime
-│   │   └── widgets/                  # Widgets de sistema reutilizables (DFButton, DFTextField…)
+│   │   │   └── df_date_utils.dart    # isoDate · displayDate · formatTime · today
+│   │   └── widgets/                  # Widgets de sistema reutilizables
 │   │
-│   ├── domain/                       # Lógica de negocio pura (sin Flutter)
-│   │   ├── entities/                 # Clases de dominio: Task, Habit, User, Achievement…
+│   ├── domain/                        # Lógica de negocio pura (sin Flutter)
+│   │   ├── entities/                 # Task, Habit, User, Achievement, DailySummary…
 │   │   ├── repositories/             # Interfaces abstractas de repositorios
-│   │   └── usecases/                 # Un use case por operación de negocio
-│   │       ├── auth/                 # Login, Register, Logout, IsAuthenticated…
-│   │       ├── habits/               # AddHabit, UpdateHabit, GetHabitStreak…
-│   │       ├── tasks/                # AddTask, ToggleTask, SearchTasks…
-│   │       ├── stats/                # GetTodayStats, GetWeeklyStats, GetMonthlyStats
-│   │       ├── backup/               # ExportCsv, ExportPdf, CreateBackup, RestoreBackup
-│   │       └── achievements/         # GetAchievements, CheckAndUnlock
+│   │   ├── usecases/                  # Un use case por operación de negocio
+│   │   │   ├── auth/                  # Login, Register, Logout, IsAuthenticated, RestoreSession
+│   │   │   ├── habits/               # AddHabit, UpdateHabit, GetHabitStreak, GetGlobalStreak…
+│   │   │   ├── tasks/                # AddTask, ToggleTask, SearchTasks…
+│   │   │   ├── stats/                # GetTodayStats, GetWeeklyStats, GetMonthlyStats
+│   │   │   ├── backup/               # ExportCsv, ExportPdf, CreateBackup, RestoreBackup
+│   │   │   └── achievements/         # GetAchievements, CheckAchievements
+│   │   └── validators/               # Validators (email, contraseña, nombre)
 │   │
-│   ├── data/                         # Implementaciones de infraestructura
+│   ├── data/                          # Implementaciones de infraestructura
 │   │   ├── datasources/
-│   │   │   ├── local_database.dart         # Contrato abstracto del DB
-│   │   │   ├── local_database_impl.dart    # SQLite — esquema v1 con 6 tablas
+│   │   │   ├── local_database.dart         # Contrato abstracto + databaseName getter
+│   │   │   ├── local_database_impl.dart    # SQLite — esquema v3 con 6 tablas
 │   │   │   ├── file_datasource.dart        # CSV, PDF, ZIP
 │   │   │   ├── biometric_datasource.dart   # LocalAuthentication
 │   │   │   └── google_drive_datasource.dart
-│   │   ├── models/                   # Conversión entity ↔ Map<String,dynamic>
+│   │   ├── helpers/
+│   │   │   └── repository_helper.dart     # executeOrFailure<T>() — boilerplate reduction
+│   │   ├── models/                    # Conversión entity ↔ Map<String,dynamic>
 │   │   └── repositories/             # Implementan interfaces del dominio
 │   │
-│   ├── presentation/                 # UI de la capa de presentación
-│   │   ├── providers/                # Riverpod providers y notifiers
-│   │   │   ├── dependency_providers.dart   # Wiring de repositorios y use cases
+│   ├── l10n/                          # Internacionalización
+│   │   ├── app_es.arb                 # 145+ claves en español (template)
+│   │   ├── app_en.arb                 # 145+ claves en inglés
+│   │   ├── app_localizations.dart     # Generado por flutter gen-l10n
+│   │   ├── app_localizations_es.dart
+│   │   └── app_localizations_en.dart
+│   │
+│   ├── presentation/                  # UI de la capa de presentación
+│   │   ├── providers/                 # Riverpod providers y notifiers
+│   │   │   ├── datasource_providers.dart   # LocalDatabase, FileDatasource
+│   │   │   ├── repository_providers.dart   # 7 repos con DI
+│   │   │   ├── task_usecase_providers.dart  # 6 use cases de tareas
+│   │   │   ├── habit_usecase_providers.dart # 7 use cases de hábitos
+│   │   │   ├── stats_usecase_providers.dart # 3 use cases de estadísticas
+│   │   │   ├── achievement_usecase_providers.dart
+│   │   │   ├── auth_usecase_providers.dart   # 7 use cases de autenticación
+│   │   │   ├── backup_usecase_providers.dart # 4 use cases de backup
+│   │   │   ├── dependency_providers.dart     # Barrel export de todos los providers
 │   │   │   ├── auth_provider.dart
 │   │   │   ├── habits_provider.dart
-│   │   │   ├── tasks_provider.dart
+│   │   │   ├── tasks_provider.dart           # + todayUpcomingTasksProvider
 │   │   │   ├── stats_provider.dart
 │   │   │   ├── achievements_provider.dart
 │   │   │   ├── backup_provider.dart
-│   │   │   ├── theme_provider.dart
-│   │   │   └── …
-│   │   ├── screens/                  # Pantallas por módulo
-│   │   │   ├── home/
-│   │   │   ├── habits/
-│   │   │   ├── tasks/
-│   │   │   ├── stats/
-│   │   │   ├── backup/
-│   │   │   ├── achievements/
-│   │   │   └── calendar/
-│   │   └── widgets/                  # Widgets de presentación reutilizables
-│   │       ├── df_loading.dart
-│   │       ├── df_empty.dart
-│   │       ├── df_error.dart
-│   │       ├── df_progress_bar.dart
-│   │       ├── df_confetti.dart
-│   │       └── df_search_delegate.dart
+│   │   │   ├── theme_provider.dart           # Notifier<ThemeModeOption>
+│   │   │   ├── biometric_provider.dart
+│   │   │   ├── google_drive_provider.dart
+│   │   │   ├── celebration_provider.dart
+│   │   │   └── home_widget_updater_provider.dart  # Con debounce 500ms
+│   │   ├── screens/                   # Pantallas por módulo
+│   │   └── widgets/                   # Widgets de presentación reutilizables
 │   │
-│   ├── features/                     # Código específico de features complejas
-│   │   ├── auth/                     # Splash, Login, Register, ForgotPassword
-│   │   ├── habits/                   # AddHabitScreen (selector icono/color/días)
+│   ├── features/                      # Código específico de features complejas
+│   │   ├── auth/                      # Splash, Login, Register, ForgotPassword
+│   │   ├── habits/                    # AddHabitScreen (selector icono/color/días)
 │   │   ├── tasks/                    # AddTaskScreen, TaskDetailScreen
-│   │   └── more/                     # ProfileScreen, NotificationsScreen
+│   │   └── more/                      # ProfileScreen, NotificationsScreen
 │   │
 │   └── shared/
 │       └── widgets/
-│           ├── df_app_bar.dart       # AppBar personalizada
-│           └── df_nav_shell.dart     # Bottom nav + 5 ramas con estado preservado
+│           ├── df_app_bar.dart         # AppBar personalizada
+│           └── df_nav_shell.dart       # Bottom nav + 5 ramas con estado preservado
+│
+├── test/                              # Tests unitarios
+│   ├── data/repositories/             # AuthHashing tests
+│   ├── domain/entities/              # Task, Habit, User entity tests
+│   ├── domain/usecases/auth/         # Login, Register use case tests
+│   ├── domain/usecases/habits/
+│   ├── domain/usecases/tasks/
+│   └── helpers/mocks.dart            # Mocktail mocks
 │
 ├── pubspec.yaml
+├── l10n.yaml                          # Config de flutter gen-l10n
 └── README.md
 ```
 
@@ -290,7 +325,7 @@ dayflow/
 
 ## Base de datos
 
-Archivo local: `dayflow_v3.db` (SQLite, versión de esquema 1). `PRAGMA foreign_keys = ON` activo. Todos los `CREATE TABLE` usan `IF NOT EXISTS` para garantizar idempotencia.
+Archivo local: `dayflow.db` (SQLite, versión de esquema 3). `PRAGMA foreign_keys = ON` activo. Todos los `CREATE TABLE` usan `IF NOT EXISTS` para garantizar idempotencia.
 
 ### Tabla `tasks`
 
@@ -316,7 +351,7 @@ Archivo local: `dayflow_v3.db` (SQLite, versión de esquema 1). `PRAGMA foreign_
 | `frequency` | `TEXT NOT NULL DEFAULT 'daily'` | `daily` · `weekly` · `custom` |
 | `active_days` | `TEXT NOT NULL DEFAULT '1111100'` | 7 chars Lun→Dom: `'1'` = activo · `'0'` = inactivo |
 | `goal` | `REAL NOT NULL DEFAULT 1.0` | Meta diaria (unidades) |
-| `unit` | `TEXT NOT NULL DEFAULT 'count'` | Etiqueta de la unidad (vasos, km, min…) |
+| `unit` | `TEXT NOT NULL DEFAULT 'count'` | Etiqueta de la unidad |
 
 ### Tabla `habit_progress`
 
@@ -357,47 +392,43 @@ Archivo local: `dayflow_v3.db` (SQLite, versión de esquema 1). `PRAGMA foreign_
 | `id` | `INTEGER PK AUTOINCREMENT` | Identificador único |
 | `name` | `TEXT NOT NULL` | Nombre completo |
 | `email` | `TEXT NOT NULL UNIQUE` | Correo electrónico (minúsculas) |
-| `password_hash` | `TEXT NOT NULL` | SHA-256 de la contraseña |
+| `password_hash` | `TEXT NOT NULL` | SHA-256 con salt (formato: `hash$salt`) |
 | `created_at` | `TEXT` | ISO timestamp de creación |
+
+> **Nota:** El hash de contraseña usa formato `hash$salt` con migración automática de hashes legacy (sin salt). La entidad de dominio `UserEntity` no expone `passwordHash`.
 
 ---
 
 ## Gestión de estado
 
-DayFlow usa **Riverpod 2.x** como sistema de gestión de estado. La inyección de dependencias se centraliza en `dependency_providers.dart`.
+DayFlow usa **Riverpod 2.x** como sistema de gestión de estado. La inyección de dependencias se organiza en módulos por feature (ver `presentation/providers/`).
 
 ```
 Provider                           Tipo                        Responsabilidad
 ────────────────────────────────────────────────────────────────────────────────────
-localDatabaseProvider              Provider<LocalDatabase>     Singleton de acceso a SQLite
-authStateProvider                  AsyncNotifierProvider       Sesión del usuario autenticado
-habitsProvider                     AsyncNotifierProvider       CRUD de hábitos
-todayProgressProvider              AsyncNotifierProvider       Mapa habitId → HabitProgressEntity (hoy)
-globalStreakProvider               FutureProvider<int>         Días consecutivos de actividad global
-habitStreakProvider                FutureProvider.family       Racha individual por hábito
-tasksProvider                      AsyncNotifierProvider       CRUD de tareas
-filteredTasksProvider              Provider<AsyncValue<List>>  Tareas filtradas por categoría
-searchedTasksProvider              Provider<AsyncValue<List>>  Tareas filtradas por texto
-todayStatsProvider                 FutureProvider              Resumen del día actual
-weeklyStatsProvider                FutureProvider              Estadísticas de la semana en curso
-monthlyStatsProvider               FutureProvider.family       Estadísticas por año/mes
-achievementsProvider               AsyncNotifierProvider       Lista de logros + desbloqueo
-backupOperationProvider            AsyncNotifierProvider       Estado de operaciones de backup
-themeModeProvider                  StateNotifierProvider       Modo de tema (light/dark/system)
-biometricsAvailableProvider        FutureProvider<bool>        Disponibilidad de biometría
-```
+Datasource providers
+  localDatabaseProvider            Provider<LocalDatabase>     Singleton SQLite
+  fileDatasourceProvider           Provider<FileDatasource>    CSV, PDF, ZIP
 
-**Flujo de mutación — ejemplo: incrementar progreso de un hábito:**
+Repository providers
+  taskRepositoryProvider           Provider<TaskRepository>    Tareas + notificaciones
+  habitRepositoryProvider          Provider<HabitRepository>   Hábitos CRUD
+  statsRepositoryProvider          Provider<StatsRepository>   Estadísticas
+  achievementRepositoryProvider    Provider<AchievementRepo>   Logros
+  authRepositoryProvider            Provider<AuthRepository>    Auth + hash con salt
+  settingsRepositoryProvider       Provider<SettingsRepo>      Preferencias
+  backupRepositoryProvider          Provider<BackupRepository>  Export/Import
 
-```
-Usuario toca el botón "+"
-  → todayProgressProvider.notifier.increment(habitId, 1.0)
-      → IncrementHabitProgressUseCase.call(habitId, date, 1.0)
-          → HabitRepositoryImpl.incrementProgress()
-              → LocalDatabaseImpl.insertOrReplaceHabitProgress()  ← SQLite
-      → UI se reconstruye automáticamente (barra de progreso, %)
-      → Si current + delta >= target → celebrationTriggerProvider = true → confeti
-      → globalStreakProvider se invalida y recalcula
+State providers
+  authStateProvider                 AsyncNotifier<AuthUser?>     Sesión del usuario
+  habitsProvider                    AsyncNotifier<List<Habit>>  CRUD de hábitos
+  todayProgressProvider            AsyncNotifier<Map<int, HP>>  Progreso de hoy
+  globalStreakProvider             FutureProvider<int>          Racha global
+  tasksProvider                     AsyncNotifier<List<Task>>   CRUD de tareas
+  todayUpcomingTasksProvider        Provider<AsyncValue<List>>  Tareas pendientes de hoy
+  filteredTasksProvider            Provider<AsyncValue<List>>   Tareas filtradas por categoría
+  themeModeProvider                 Notifier<ThemeModeOption>   Modo de tema
+  homeWidgetUpdaterProvider        Provider<void>              Home widget (debounced 500ms)
 ```
 
 ---
@@ -432,6 +463,20 @@ Rutas adicionales (fuera del shell)
 
 ---
 
+## Internacionalización (i18n)
+
+DayFlow soporta **español (es_ES)** e **inglés (en_US)** con 145+ claves traducidas, generadas por `flutter gen-l10n`.
+
+- Archivos ARB: `lib/l10n/app_es.arb` (template) y `lib/l10n/app_en.arb`
+- Generados: `lib/l10n/app_localizations.dart`, `app_localizations_es.dart`, `app_localizations_en.dart`
+- Uso en código: `final l10n = AppLocalizations.of(context)!;` → `l10n.helloTitle`, `l10n.loginButton`, etc.
+- Locale por defecto: `es_ES`
+- Strings parametrizados: `l10n.goalLabel(value, unit)`, `l10n.memberSince(date)`, `l10n.deleteHabitConfirm(name)`
+
+Todos los strings de UI en las 15+ pantallas usan `AppLocalizations`. Los providers sin `BuildContext` (como `homeWidgetUpdaterProvider`) mantienen strings hardcodeados.
+
+---
+
 ## Sistema de diseño
 
 ### Paleta de colores (tema oscuro)
@@ -445,7 +490,7 @@ Rutas adicionales (fuera del shell)
 | `blue` | `#3D7BFF` | Primario de marca |
 | `blueDeep` | `#2A5BC8` | Pressed / variante oscura del primario |
 | `blueSoft` | `#3D7BFF26` | Fondo de acciones azules (15% opacidad) |
-| `violet` | `#7C3AED` | Acento secundario |
+| `violet` | `#7C3AED` | Acentos secundario |
 | `catAcademic` | `#3D7BFF` | Categoría Académica |
 | `catHealth` | `#22C55E` | Categoría Salud |
 | `catPersonal` | `#F59E0B` | Categoría Personal |
@@ -456,7 +501,7 @@ Rutas adicionales (fuera del shell)
 | `textDim` | `#A4A8B3` | Texto secundario |
 | `textMute` | `#6B6F7A` | Hints y placeholders |
 
-### Tipografía
+### Tipografía (bundled — sin `google_fonts`)
 
 | Estilo | Fuente | Tamaño | Peso | Uso |
 |---|---|---|---|---|
@@ -499,8 +544,8 @@ Rutas adicionales (fuera del shell)
 
 | Herramienta | Versión mínima | Enlace |
 |---|---|---|
-| Flutter SDK | 3.12+ | [flutter.dev](https://flutter.dev/docs/get-started/install) |
-| Dart SDK | 3.12+ | incluido con Flutter |
+| Flutter SDK | 3.4+ | [flutter.dev](https://flutter.dev/docs/get-started/install) |
+| Dart SDK | 3.4+ | incluido con Flutter |
 | Android Studio | Hedgehog+ | [developer.android.com](https://developer.android.com/studio) |
 | Xcode | 14+ | solo para iOS/macOS |
 | Git | cualquiera | [git-scm.com](https://git-scm.com) |
@@ -515,11 +560,13 @@ cd dayflow
 # 2. Instalar dependencias
 flutter pub get
 
-# 3. Verificar que el código está limpio
-flutter analyze
-# → No issues found.
+# 3. Generar archivos de localización
+flutter gen-l10n
 
-# 4. Ejecutar en modo debug (conectar dispositivo o iniciar emulador primero)
+# 4. Verificar que el código está limpio
+flutter analyze
+
+# 5. Ejecutar en modo debug (conectar dispositivo o iniciar emulador primero)
 flutter run
 
 # Para un dispositivo específico
@@ -575,7 +622,7 @@ flutter build macos --release
 | `POST_NOTIFICATIONS` | Notificaciones de recordatorio (Android 13+) |
 | `SCHEDULE_EXACT_ALARM` | Recordatorios en hora exacta |
 | `USE_EXACT_ALARM` | Variante para API 33+ |
-| `RECEIVE_BOOT_COMPLETED` | Restaurar notificaciones tras reinicio del dispositivo |
+| `RECEIVE_BOOT_COMPLETED` | Restaurar notificaciones tras reinicio |
 | `VIBRATE` | Vibración en notificaciones |
 | `USE_BIOMETRIC` | Autenticación biométrica |
 | `USE_FINGERPRINT` | Huella dactilar (API < 28) |
@@ -585,14 +632,20 @@ flutter build macos --release
 
 ## Roadmap
 
+- [x] Internacionalización EN/ES completa con `flutter_localizations` (145+ claves)
+- [x] Tests unitarios de use cases y entidades del dominio
+- [x] Seguridad: hash SHA-256 + salt para contraseñas
+- [x] Accesibilidad: Semantics labels + InkWell en widgets críticos
+- [x] Fuentes bundled (offline-first) en vez de google_fonts
+- [x] Providers organizados por feature en módulos separados
+- [x] Debounce en home widget updater (500ms)
+- [x] Validadores de dominio centralizados
 - [ ] Sincronización automática en background con Google Drive
 - [ ] Widget de pantalla de inicio completamente funcional (Android/iOS)
 - [ ] Exportación a iCloud Drive (iOS)
 - [ ] Modo multiscreensize (tablets y foldables)
-- [ ] Tests unitarios de use cases y repositorios
 - [ ] Tests de integración con `integration_test`
 - [ ] Flavors: `dev` / `staging` / `production`
-- [ ] Internacionalización completa EN/ES mediante `flutter_localizations`
 
 ---
 
