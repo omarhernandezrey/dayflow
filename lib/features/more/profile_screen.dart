@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
+import '../../domain/entities/achievement.dart';
+import '../../domain/entities/weekly_stats.dart';
+import '../../presentation/providers/achievements_provider.dart';
+import '../../presentation/providers/auth_provider.dart';
+import '../../presentation/providers/habits_provider.dart';
+import '../../presentation/providers/stats_provider.dart';
 import '../../shared/widgets/df_app_bar.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
-  static const _achievements = [
-    _Achievement(Icons.local_fire_department_rounded, 'Racha de 10 días', AppColors.catPersonal, true),
-    _Achievement(Icons.emoji_events_outlined, 'Semana perfecta', Color(0xFFF472B6), true),
-    _Achievement(Icons.water_drop_outlined, 'Hidratado', Color(0xFF38BDF8), true),
-    _Achievement(Icons.menu_book_outlined, 'Lector ávido', AppColors.catAcademic, true),
-    _Achievement(Icons.fitness_center_rounded, '30 entrenos', AppColors.catHealth, false),
-    _Achievement(Icons.auto_awesome_outlined, 'Madrugador', Color(0xFFFBBF24), false),
-  ];
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userName = ref.watch(authStateProvider.select((v) => v.valueOrNull?.name ?? 'Usuario'));
+    final userInitials = ref.watch(authStateProvider.select((v) => v.valueOrNull?.initials ?? 'U'));
+    final createdAt = ref.watch(authStateProvider.select((v) => v.valueOrNull?.createdAt));
+
+    final streakAsync = ref.watch(globalStreakProvider);
+    final weeklyStatsAsync = ref.watch(weeklyStatsProvider);
+    final achievementsAsync = ref.watch(achievementsProvider);
+
     return Scaffold(
       backgroundColor: AppColors.bg,
-      appBar: const DFAppBar(
-          title: 'Mi perfil', showBack: true, showSettings: true),
+      appBar: const DFAppBar(title: 'Mi perfil', showBack: true, showSettings: true),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
           AppDimensions.s5,
@@ -30,7 +36,6 @@ class ProfileScreen extends StatelessWidget {
           AppDimensions.s6,
         ),
         children: [
-          // Avatar
           Center(
             child: Column(
               children: [
@@ -53,7 +58,7 @@ class ProfileScreen extends StatelessWidget {
                     ],
                   ),
                   alignment: Alignment.center,
-                  child: Text('JD',
+                  child: Text(userInitials,
                       style: AppTypography.inter(
                         fontSize: 32,
                         fontWeight: FontWeight.w700,
@@ -62,14 +67,15 @@ class ProfileScreen extends StatelessWidget {
                       )),
                 ),
                 const SizedBox(height: AppDimensions.s3),
-                Text('Juan David Quiceno',
+                Text(userName,
                     style: AppTypography.inter(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.3,
                     )),
                 const SizedBox(height: 2),
-                Text('Miembro desde marzo 2026',
+                Text(
+                    createdAt != null ? 'Miembro desde ${_formatMemberSince(createdAt)}' : 'Miembro reciente',
                     style: AppTypography.caption),
               ],
             ),
@@ -77,97 +83,113 @@ class ProfileScreen extends StatelessWidget {
 
           const SizedBox(height: AppDimensions.s5),
 
-          // Stats strip
-          Row(
-            children: const [
-              _StatTile('42', 'Hábitos hechos'),
-              SizedBox(width: AppDimensions.s2 + 2),
-              _StatTile('12', 'Racha actual'),
-              SizedBox(width: AppDimensions.s2 + 2),
-              _StatTile('78%', 'Esta semana'),
-            ],
-          ),
-
-          const SizedBox(height: AppDimensions.s5),
-
-          // Achievements header
           Row(
             children: [
-              Expanded(
-                child: Text('Logros',
-                    style: AppTypography.inter(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
-                    )),
+              _StatTile(
+                value: '${streakAsync.valueOrNull ?? 0}',
+                label: 'Racha actual',
               ),
-              Text('4 / 6',
-                  style: AppTypography.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textDim,
-                  )),
+              const SizedBox(width: AppDimensions.s2 + 2),
+              _StatTile(
+                value: _formatCompletion(weeklyStatsAsync.valueOrNull),
+                label: 'Esta semana',
+              ),
+              const SizedBox(width: AppDimensions.s2 + 2),
+              _StatTile(
+                value: '${achievementsAsync.valueOrNull?.where((a) => a.isUnlocked).length ?? 0}',
+                label: 'Logros',
+              ),
             ],
-          ),
-          const SizedBox(height: AppDimensions.s3),
-
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 3,
-            crossAxisSpacing: AppDimensions.s2 + 2,
-            mainAxisSpacing: AppDimensions.s2 + 2,
-            childAspectRatio: 0.85,
-            children: _achievements.map((a) {
-              return Opacity(
-                opacity: a.unlocked ? 1.0 : 0.45,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppDimensions.s4 - 2,
-                    horizontal: AppDimensions.s2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    border: Border.all(color: AppColors.border),
-                    borderRadius: BorderRadius.circular(AppDimensions.rMd),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: a.unlocked
-                              ? a.color.withAlpha(34)
-                              : AppColors.surface2,
-                          borderRadius:
-                              BorderRadius.circular(AppDimensions.rSm + 2),
-                        ),
-                        child: Icon(a.icon,
-                            size: 22,
-                            color: a.unlocked ? a.color : AppColors.textMute),
-                      ),
-                      const SizedBox(height: AppDimensions.s2),
-                      Text(a.title,
-                          style: AppTypography.inter(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.1,
-                            height: 1.2,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
           ),
 
           const SizedBox(height: AppDimensions.s5),
 
-          // Settings shortcuts
+          achievementsAsync.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (achievements) {
+              final unlocked = achievements.where((a) => a.isUnlocked).length;
+              return Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text('Logros',
+                            style: AppTypography.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2,
+                            )),
+                      ),
+                      Text('$unlocked / ${achievements.length}',
+                          style: AppTypography.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textDim,
+                          )),
+                    ],
+                  ),
+                  const SizedBox(height: AppDimensions.s3),
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 3,
+                    crossAxisSpacing: AppDimensions.s2 + 2,
+                    mainAxisSpacing: AppDimensions.s2 + 2,
+                    childAspectRatio: 0.85,
+                    children: achievements.map((a) {
+                      return Opacity(
+                        opacity: a.isUnlocked ? 1.0 : 0.45,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppDimensions.s4 - 2,
+                            horizontal: AppDimensions.s2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            border: Border.all(color: AppColors.border),
+                            borderRadius: BorderRadius.circular(AppDimensions.rMd),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: a.isUnlocked
+                                      ? AppColors.catPersonal.withAlpha(34)
+                                      : AppColors.surface2,
+                                  borderRadius:
+                                      BorderRadius.circular(AppDimensions.rSm + 2),
+                                ),
+                                child: Icon(_achievementIcon(a.icon),
+                                    size: 22,
+                                    color: a.isUnlocked ? AppColors.catPersonal : AppColors.textMute),
+                              ),
+                              const SizedBox(height: AppDimensions.s2),
+                              Text(a.title,
+                                  style: AppTypography.inter(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: -0.1,
+                                    height: 1.2,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              );
+            },
+          ),
+
+          const SizedBox(height: AppDimensions.s5),
+
           Container(
             decoration: BoxDecoration(
               color: AppColors.surface,
@@ -190,10 +212,44 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
+
+  String _formatMemberSince(String isoDate) {
+    try {
+      final date = DateTime.parse(isoDate);
+      const months = [
+        '', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+        'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+      ];
+      return '${months[date.month]} ${date.year}';
+    } catch (_) {
+      return isoDate;
+    }
+  }
+
+  String _formatCompletion(WeeklyStatsEntity? stats) {
+    final pct = stats?.completionPercentage ?? 0;
+    return '${pct.toInt()}%';
+  }
+
+  IconData _achievementIcon(String key) {
+    return switch (key) {
+      'fire' => Icons.local_fire_department_rounded,
+      'task' => Icons.check_circle_outline_rounded,
+      'star' => Icons.star_rounded,
+      'sun' => Icons.wb_sunny_rounded,
+      'water' => Icons.water_drop_outlined,
+      'calendar' => Icons.calendar_today_outlined,
+      'trophy' => Icons.emoji_events_outlined,
+      'crown' => Icons.workspace_premium_outlined,
+      'backup' => Icons.backup_outlined,
+      'habit' => Icons.repeat_rounded,
+      _ => Icons.emoji_events_outlined,
+    };
+  }
 }
 
 class _StatTile extends StatelessWidget {
-  const _StatTile(this.value, this.label);
+  const _StatTile({required this.value, required this.label});
   final String value;
   final String label;
 
@@ -271,12 +327,4 @@ class _ShortcutTile extends StatelessWidget {
       ),
     );
   }
-}
-
-class _Achievement {
-  const _Achievement(this.icon, this.title, this.color, this.unlocked);
-  final IconData icon;
-  final String title;
-  final Color color;
-  final bool unlocked;
 }
