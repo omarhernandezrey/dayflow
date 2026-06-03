@@ -37,7 +37,7 @@ Future<void> main() async {
   runApp(
     UncontrolledProviderScope(
       container: container,
-      child: DayFlowApp(),
+      child: const DayFlowApp(),
     ),
   );
 
@@ -50,12 +50,9 @@ class _AppLifecycleObserver extends WidgetsBindingObserver {
   _AppLifecycleObserver(this._db);
 
   @override
-  Future<void> didDetachApp() async {
-    await _db.close();
-  }
-
-  @override
-  Future<void> handleMemoryPressure() async {
-    await _db.close();
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached) {
+      _db.close();
+    }
   }
 }
